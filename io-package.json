@@ -1,0 +1,102 @@
+{
+    "common": {
+        "name": "epson-esc-vp21",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "首次出版"
+            }
+        },
+        "title": "Epson Projector via ESC/VP21",
+        "titleLang": {
+            "en": "Epson Projector via ESC/VP21",
+            "de": "Epson Projektor über ESC/VP21",
+            "ru": "Проектор Epson через ESC/VP21",
+            "pt": "Projetor Epson via ESC/VP21",
+            "nl": "Epson-projector via ESC/VP21",
+            "fr": "Projecteur Epson via ESC/VP21",
+            "it": "Proiettore Epson tramite ESC/VP21",
+            "es": "Proyector Epson vía ESC/VP21",
+            "pl": "Projektor Epson przez ESC/VP21",
+            "zh-cn": "爱普生投影仪通过 ESC/VP21"
+        },
+        "desc": {
+            "en": "Adapter for Epson projectors with ESC/VP21 support over wifi (e.g. EH-TW5650)",
+            "de": "Adapter für Epson-Projektoren mit ESC/VP21-Unterstützung über WLAN (z. B. EH-TW5650)",
+            "ru": "Адаптер для проекторов Epson с поддержкой ESC/VP21 через Wi-Fi (например, EH-TW5650)",
+            "pt": "Adaptador para projetores Epson com suporte ESC/VP21 via wifi (por exemplo, EH-TW5650)",
+            "nl": "Adapter voor Epson-projectoren met ESC/VP21-ondersteuning via wifi (bijv. EH-TW5650)",
+            "fr": "Adaptateur pour projecteurs Epson avec prise en charge ESC/VP21 via Wi-Fi (par exemple EH-TW5650)",
+            "it": "Adattatore per proiettori Epson con supporto ESC/VP21 tramite Wi-Fi (es. EH-TW5650)",
+            "es": "Adaptador para proyectores Epson con soporte ESC/VP21 a través de wifi (por ejemplo, EH-TW5650)",
+            "pl": "Adapter do projektorów Epson z obsługą ESC/VP21 przez Wi-Fi (np. EH-TW5650)",
+            "zh-cn": "通过 wifi 支持 ESC/VP21 的 Epson 投影仪适配器（例如 EH-TW5650）"
+        },
+        "authors": [
+            "Azador <github@lobo.uber.space>"
+        ],
+        "keywords": [
+            "epson",
+            "projector",
+            "wifi"
+        ],
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "main": "main.js",
+        "icon": "epson-esc-vp21.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/Azador/ioBroker.epson-esc-vp21/main/admin/epson-esc-vp21.png",
+        "readme": "https://github.com/Azador/ioBroker.epson-esc-vp21/blob/main/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "multimedia",
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "poll",
+        "materialize": true,
+        "supportCustoms": true,
+        "dependencies": [
+            {
+                "js-controller": ">=2.0.0"
+            }
+        ]
+    },
+    "native": {
+        "net_address": "Beamer",
+        "port_number": "3629",
+        "poll_intervall": "20"
+    },
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Device or service connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
+    ]
+}
