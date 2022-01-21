@@ -12,6 +12,51 @@ const Net = require("net");
 // Load your modules here, e.g.:
 // const fs = require("fs");
 
+const projector_name = "projector";
+
+const device_states = [
+    {tag: "PWR",          name: "power_state",         common: { type: "string",  write: false, role: "state" }},
+    {tag: "VKEYSTONE",    name: "vertical_keystone",   common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "HKEYSTONE",    name: "horizontal_keystone", common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "AUTOKEYSTONE", name: "auto_keystone",       common: { type: "boolean", write: true,  role: "switch", on: "ON", off: "OFF" }},
+    {tag: "ASPECT",       name: "aspect",              common: { type: "string",  write: false, role: "state" }},
+    {tag: "LUMINANCE",    name: "luminance",           common: { type: "number",  write: false, role: "switch" }},
+    {tag: "OVSCAN",       name: "ovscan",              common: { type: "number",  write: false, role: "state" }},
+    {tag: "SOURCE",       name: "source",              common: { type: "string",  write: false, role: "state" }},
+    {tag: "AUTOSEARCH",   name: "auto_source_search",  common: { type: "boolean", write: true,  role: "switch", on: "01", off: "00" }},
+    {tag: "BRIGHT",       name: "brightness",          common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "CONTRAST",     name: "contrast",            common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "DENSITY",      name: "density",             common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "TINT",         name: "tint",                common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "SHARP",        name: "sharpness",           common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "CTEMP",        name: "color_temperature",   common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "CMODE",        name: "color_mode",          common: { type: "string",  write: false, role: "state" }},
+    {tag: "HPOS",         name: "horizontal_position", common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "VPOS",         name: "vertical_position",   common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "TRACKiNG",     name: "tracking",            common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "SYNC",         name: "sync_value",          common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "NRS",          name: "noise_reduction_adj", common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "MPEGNRS",      name: "mpeg_noise_reduction",common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "OFFSETR",      name: "offset_value_red",    common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "OFFSETG",      name: "offset_value_green",  common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "OFFSETB",      name: "offset_value_blue",   common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "GAINR",        name: "gain_value_red",      common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "GAING",        name: "gain_value_green",    common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "GAINB",        name: "gain_value_blue",     common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "GAMMA",        name: "gamma",               common: { type: "string",  write: false, role: "state" }},
+    {tag: "DESTRENGTH",   name: "detail_enhancement",  common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "MCFI",         name: "frame_interpolation", common: { type: "string",  write: false, role: "state" }},
+    {tag: "VOL",          name: "volume",              common: { type: "number" , write: true , role: "level.volume", min: 0, max: 255 }},
+    {tag: "HREVERSE",     name: "horizontal_reverse",  common: { type: "boolean", write: true,  role: "switch", on: "ON", off: "OFF" }},
+    {tag: "VREVERSE",     name: "vertical_reverse",    common: { type: "boolean", write: true,  role: "switch", on: "ON", off: "OFF" }},
+    {tag: "ILLUM",        name: "illumination",        common: { type: "boolean", write: true,  role: "switch", on: "01", off: "00" }},
+    {tag: "WDNAME",       name: "wfd_display_name",    common: { type: "string",  write: false, role: "state" }},
+    {tag: "LAMP",         name: "lamp_hours",          common: { type: "number" , write: false, role: "state" }},
+    {tag: "SNO",          name: "serial_number",       common: { type: "string",  write: false, role: "state" }},
+];
+
+
+
 class EpsonEscVp21 extends utils.Adapter {
 
     /**
@@ -69,13 +114,14 @@ class EpsonEscVp21 extends utils.Adapter {
     }
 
     pollDeviceStatus () {
-        this.addCommand ("PWR?\r");
-        this.addCommand ("SOURCE?\r");
-        this.addCommand ("VOL?\r");
-        this.addCommand ("LAMP?\r");
+        for (const i in device_states) {
+            this.addCommand (device_states[i].tag + "?\r");
+        }
     }
 
     gotValue (name, val) {
+        let handled = true;
+
         switch (name) {
             case "PWR": {
                 let power_state = "unknown";
@@ -103,22 +149,10 @@ class EpsonEscVp21 extends utils.Adapter {
                         power_state = "Abnormality standby";
                         break;
                 }
-                this.setState ("power_state", power_state, true);
-                this.setState ("power", power, true);
+                this.setState (projector_name + ".power_state", power_state, true);
+                this.setState (projector_name + ".power", power, true);
                 break;
             }
-
-            case "LAMP":
-                this.setState ("lamp_hours", parseInt (val), true);
-                break;
-
-            case "SOURCE":
-                this.setState ("source", val, true);
-                break;
-
-            case "VOL":
-                this.setState ("volume", parseInt (val), true);
-                break;
 
             case "IMEVENT":
                 // IMEVENT: 0001 02 00000000 00000000 T1 F1
@@ -136,6 +170,29 @@ class EpsonEscVp21 extends utils.Adapter {
                 break;
 
             default:
+                handled = false;
+        }
+
+        if (!handled) {
+            for (const i in device_states) {
+                if (name == device_states[i].tag) {
+                    if (device_states[i].common.type == "number") {
+                        this.setState (projector_name + "." + device_states[i].name, parseInt (val), true);
+                    } else if (device_states[i].common.type == "boolean") {
+                        let v = false;
+                        if (val == "1" || val == "ON" || val == "01")
+                            v = true;
+
+                        this.setState (projector_name + "." + device_states[i].name, v, true);
+                    } else {
+                        this.setState (projector_name + "." + device_states[i].name, val, true);
+                    }
+
+                    handled = true;
+                }
+            }
+
+            if (!handled)
                 this.log.info ("Unknown value: " + name + " = " + val);
         }
     }
@@ -143,13 +200,26 @@ class EpsonEscVp21 extends utils.Adapter {
     gotState (name) {
         if (name == "ERR") {
             if (typeof this._process_command == "string" || this._process_command instanceof String) {
-                if (this._process_command.startsWith ("SOURCE?")) {
-                    this.setState ("source", "n/a", true);
-                } else if (this._process_command.startsWith ("VOL?")) {
-                    this.setState ("volume", null, true);
-                } else if (this._process_command.startsWith ("LAMP?")) {
-                    // ignore this? this.setState ("volume", null, true);
+                let handled = false;
+
+                if (this._process_command.startsWith ("LAMP?")) {
+                    // ignore this? this.setState ("lamp_hours", null, true);
+                    handled = true;
                 } else {
+                    for (const i in device_states) {
+                        if (this._process_command.startsWith (device_states[i].tag + "?")) {
+                            if (device_states[i].common.type == "number" || device_states[i].common.type == "boolean") {
+                                this.setState (projector_name + "." + device_states[i].name, null, true);
+                            } else {
+                                this.setState (projector_name + "." + device_states[i].name, "n/a", true);
+                            }
+
+                            handled = true;
+                        }
+                    }
+                }
+
+                if (!handled) {
                     this.log.info ("Error for unknown cmd: " + this._process_command.slice (0, -1));
                 }
             } else {
@@ -266,68 +336,53 @@ class EpsonEscVp21 extends utils.Adapter {
         Here a simple template for a boolean variable named "testVariable"
         Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
         */
-        await this.setObjectNotExistsAsync("power", {
+
+        await this.setObjectNotExistsAsync(projector_name, {
+            type: "device",
+            common: {
+                name: projector_name,
+            },
+            native: {},
+        });
+
+        await this.setObjectNotExistsAsync("projector.power", {
             type: "state",
             common: {
-                name: "power",
+                name: "projector.power",
                 type: "boolean",
-                role: "indicator",
+                role: "switch.power",
                 read: true,
                 write: true,
             },
             native: {},
         });
 
-        await this.setObjectNotExistsAsync("power_state", {
-            type: "state",
-            common: {
-                name: "power_state",
-                type: "string",
-                role: "mode",
+        for (const i in device_states) {
+            const name = projector_name + "." + device_states[i].name;
+            const common = {
+                name: name,
+                type: device_states[i].common.type,
+                role: device_states[i].common.role,
                 read: true,
-                write: false,
-            },
-            native: {},
-        });
+                write: device_states[i].common.write
+            };
 
-        await this.setObjectNotExistsAsync("lamp_hours", {
-            type: "state",
-            common: {
-                name: "lamp_hours",
-                type: "number",
-                role: "value",
-                read: true,
-                write: false,
-            },
-            native: {},
-        });
-
-        await this.setObjectNotExistsAsync("source", {
-            type: "state",
-            common: {
-                name: "source",
-                type: "string",
-                role: "mode",
-                read: true,
-                write: false,
-            },
-            native: {},
-        });
-
-        await this.setObjectNotExistsAsync("volume", {
-            type: "state",
-            common: {
-                name: "volume",
-                type: "number",
-                role: "value",
-                read: true,
-                write: false,
-            },
-            native: {},
-        });
+            await this.setObjectNotExistsAsync(name, {
+                type: "state",
+                common: common,
+                native: {},
+            });
+        }
 
         // In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
-        this.subscribeStates("power");
+        this.subscribeStates (projector_name + ".power");
+        for (const i in device_states) {
+            if (device_states[i].common.write) {
+                const name = projector_name + "." + device_states[i].name;
+                this.subscribeStates (name);
+            }
+        }
+
         // You can also add a subscription for multiple states. The following line watches all states starting with "lights."
         // this.subscribeStates("lights.*");
         // Or, if you really must, you can also watch all states. Don't do this if you don't need to. Otherwise this will cause a lot of unnecessary load on the system:
@@ -367,10 +422,8 @@ class EpsonEscVp21 extends utils.Adapter {
             if (this._timer != null)
                 clearInterval (this._timer);
 
-            // clearTimeout(timeout1);
-            // clearTimeout(timeout2);
-            // ...
-            // clearInterval(interval1);
+            if (this._client instanceof Net.Socket)
+                this._client.end ();
 
             callback();
         } catch (e) {
@@ -401,15 +454,44 @@ class EpsonEscVp21 extends utils.Adapter {
      * @param {ioBroker.State | null | undefined} state
      */
     onStateChange(id, state) {
+        id = id.slice (17);
         if (state) {
             // The state was changed
             if (!state.ack) {
-                if (state.val) {
-                    // Power on projector
-                    this.addCommand ("PWR ON\r");
+                this.log.info ("State changed: " + id + " = " + JSON.stringify (state.val));
+
+                if (id == "projector.power") {
+                    if (state.val) {
+                        // Power on projector
+                        this.addCommand ("PWR ON\r");
+                    } else {
+                        // Power off projector
+                        this.addCommand ("PWR OFF\r");
+                    }
                 } else {
-                    // Power off projector
-                    this.addCommand ("PWR OFF\r");
+                    let handled = false;
+                    for (const i in device_states) {
+                        const name = projector_name + "." + device_states[i].name;
+                        if (id == name) {
+                            if (device_states[i].common.type == "number" || device_states[i].common.type == "string") {
+                                this.addCommand (device_states[i].tag + " " + String (state.val) + "\r");
+                                handled = true;
+                            } else if (device_states[i].common.type == "boolean") {
+                                let v = device_states[i].common.off;
+                                if (state.val)
+                                    v = device_states[i].common.on;
+
+                                this.addCommand (device_states[i].tag + " " + v + "\r");
+                                handled = true;
+                            } else {
+                                // Depending on tag, different values for true and false has to be send...
+                                // Missing right now, important states has to be handled separately right now
+                            }
+                        }
+                    }
+
+                    if (!handled)
+                        this.log.info ("Unhandled object: " + id + " = " + JSON.stringify (state.val));
                 }
 
                 this.pollDeviceStatus ();
