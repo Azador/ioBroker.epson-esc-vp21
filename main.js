@@ -7,7 +7,8 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
-const Net = require('net');
+const assert = require("assert");
+const Net = require("net");
 // Load your modules here, e.g.:
 // const fs = require("fs");
 
@@ -21,228 +22,228 @@ class EpsonEscVp21 extends utils.Adapter {
             ...options,
             name: "epson-esc-vp21",
         });
+        this._client = null;
+        this._pending_commands = [];
+        this._process_command = null;
+        this._connected = false;
+
         this.on("ready", this.onReady.bind(this));
         this.on("stateChange", this.onStateChange.bind(this));
         // this.on("objectChange", this.onObjectChange.bind(this));
         // this.on("message", this.onMessage.bind(this));
         this.on("unload", this.onUnload.bind(this));
+
+        this._timer = null;
+        return;
     }
 
-    _client = null;
+    addCommand (cmd) {
+        this._pending_commands.push (cmd);
+        this.processNextCommand ();
+    }
+
+    processNextCommand () {
+        if (!(this._client instanceof Net.Socket))
+            return;
+
+        if (this._process_command  != null || this._pending_commands.length == 0)
+            return;
+
+        const cmd = this._pending_commands.shift ();
+        //this.log.info ("Set next command: " + cmd);
+        this._process_command = cmd;
+        this._client.write (cmd);
+    }
 
     connectionEstablished () {
-	// If there is no error, the server has accepted the request and created a new 
-	// socket dedicated to us.
-	this.log.info ('XX: TCP connection established with the server.');
+        // If there is no error, the server has accepted the request and created a new
+        // socket dedicated to us.
+        this.log.info ("TCP connection established with the server.");
 
-	// The client can now send data to the server by writing to its socket.
-	this._client.write (Buffer ([0x45, 0x53, 0x43, 0x2f, 0x56, 0x50, 0x2e, 0x6e, 0x65, 0x74, 0x10, 3, 0, 0, 0, 0]));
-	//this.client.write('ESC/VP.net' + String.fromCharCode.apply (null, [16, 3, 0, 0, 0, 0]));
+        assert (this._client instanceof Net.Socket);
+
+        // The client can now send data to the server by writing to its socket.
+        this._process_command = "startup";
+        this._client.write (Buffer.from ([0x45, 0x53, 0x43, 0x2f, 0x56, 0x50, 0x2e, 0x6e, 0x65, 0x74, 0x10, 3, 0, 0, 0, 0]));
+        //this.client.write('ESC/VP.net' + String.fromCharCode.apply (null, [16, 3, 0, 0, 0, 0]));
     }
 
     pollDeviceStatus () {
-	this._client.write ("PWR?\r");
+        this.addCommand ("PWR?\r");
+        this.addCommand ("SOURCE?\r");
+        this.addCommand ("VOL?\r");
+        this.addCommand ("LAMP?\r");
     }
 
     gotValue (name, val) {
-	this.log.info ("Value: " + name + " = " + val);
+        switch (name) {
+            case "PWR": {
+                let power_state = "unknown";
+                let power = false;
+                switch (val) {
+                    case "00":
+                        power_state = "Standby, network off"; // How could I get this :)
+                        break;
+                    case "01":
+                        power_state = "Lamp on";
+                        power = true;
+                        break;
+                    case "02":
+                        power_state = "Warmup";
+                        power = true;
+                        break;
+                    case "03":
+                        power_state = "Cooldown";
+                        power = true;
+                        break;
+                    case "04":
+                        power_state = "Standby, network on";
+                        break;
+                    case "05":
+                        power_state = "Abnormality standby";
+                        break;
+                }
+                this.setState ("power_state", power_state, true);
+                this.setState ("power", power, true);
+                break;
+            }
+
+            case "LAMP":
+                this.setState ("lamp_hours", parseInt (val), true);
+                break;
+
+            case "SOURCE":
+                this.setState ("source", val, true);
+                break;
+
+            case "VOL":
+                this.setState ("volume", parseInt (val), true);
+                break;
+
+            case "IMEVENT":
+                // IMEVENT: 0001 02 00000000 00000000 T1 F1
+                // IMEVENT = 0001 02 00000002 00000000 T1 F1
+                // IMEVENT: 0001 03 00000002 00000000 T1 F1
+                // IMEVENT: 0001 04 00000002 00000000 T1 F1
+                // IMEVENT: 0001 01 00000000 00000000 T1 F1
+                //           |    |      |        |    |  +----- ?
+                //           |    |      |        |    +-------- ?
+                //           |    |      |        +------------- ?
+                //           |    |      +---------------------- ?
+                //           |    +----------------------------- Lamp state?
+                //           +---------------------------------- Always 1?
+                this.log.info ("IMEVENT: " + val);
+                break;
+
+            default:
+                this.log.info ("Unknown value: " + name + " = " + val);
+        }
     }
-    
+
     gotState (name) {
-	this.log.info ("State: " + name);
+        if (name == "ERR") {
+            if (typeof this._process_command == "string" || this._process_command instanceof String) {
+                if (this._process_command.startsWith ("SOURCE?")) {
+                    this.setState ("source", "n/a", true);
+                } else if (this._process_command.startsWith ("VOL?")) {
+                    this.setState ("volume", null, true);
+                } else if (this._process_command.startsWith ("LAMP?")) {
+                    // ignore this? this.setState ("volume", null, true);
+                } else {
+                    this.log.info ("Error for unknown cmd: " + this._process_command.slice (0, -1));
+                }
+            } else {
+                this.log.info ("Error for not set cmd: " + JSON.stringify (this._process_command));
+            }
+        } else {
+            this.log.info ("Unknown state 2: " + name);
+        }
     }
-    
+
     readFromDevice (data) {
-	this.log.info ("Got: " + JSON.stringify (data));
+        if (this._process_command == null)
+            this.log.info ("Got spurious reply: " + JSON.stringify (data));
 
-	if (data instanceof Buffer) {
-	    if (data.compare (Buffer ([69,83,67,47,86,80,46,110,101,116,16,3,0,0,32,0])) == 0) {
-		if (this.connected)
-		    this.log.info ("Got connection start string from projector while already connected");
-		
-		this.connected = true;
-		this.setState ('info.connection', true, true);
+        if (data instanceof Buffer) {
+            if (data.compare (Buffer.from ([69,83,67,47,86,80,46,110,101,116,16,3,0,0,32,0])) == 0) {
+                if (this._connected)
+                    this.log.info ("Got connection start string from projector while already connected");
 
-		this.pollDeviceStatus ();
-	    } else {
-		let s = String.fromCharCode.apply (null, data);
-		this.log.info ("Got reply: '" + s + "'");
+                if (this._process_command != "startup")
+                    this.log.info ("Got connection start string from projector while not waiting for it");
 
-		let a = s.split ('\r');
-		for (let i=0; i < a.length; ++i) {
-		    if (a[i] == ':') {
-			this.log.info ("Ready for new commands");
-		    } else {
-			let v = a[i].split ('=');
-			if (v.length == 2) {
-			    this.gotValue (v[0], v[1]);
-			} else if (v.length == 1) {
-			    this.gotState (v[0]);
-			} else
-			    this.log.info ("Reply " + JSON.stringify (v) + " not parsed");
-		    }
-		}
-		
-		//for (let i=0; i < data.length; ++i)
-		//	this.log.info ("data["+String(i)+"]: " + String (data[i]) + " '" + String.fromCharCode (data[i]) + "'");
-	    }
-	} else
-	    this.log.info ("not Buffer?");
-	
+                this._connected = true;
+                this._process_command = null;
+                this.setState ("info.connection", true, true);
+
+                this.pollDeviceStatus ();
+
+                this._timer = setInterval (this.pollDeviceStatus.bind (this), parseInt (this.config.poll_intervall) * 1000); // Sync Interval
+            } else {
+                const s = String.fromCharCode.apply (null, data);
+                //this.log.info ("Got reply: '" + s + "'");
+
+                const a = s.split ("\r");
+                for (let i=0; i < a.length; ++i) {
+                    if (a[i] == ":") {
+                        //this.log.info ("Ready for new commands");
+                        this._process_command = null;
+                        this.processNextCommand ();
+                    } else {
+                        if (a[0] == ":")
+                            a.shift ();
+
+                        const v = a[i].split ("=");
+                        if (v.length == 2) {
+                            this.gotValue (v[0], v[1]);
+                        } else if (v.length == 1) {
+                            this.gotState (v[0]);
+                        } else
+                            this.log.info ("Reply " + JSON.stringify (v) + " not parsed");
+                    }
+                }
+
+            }
+        } else
+            this.log.info ("not Buffer?");
     }
 
     clientOn (type, add1, add2, add3, add4) {
-	this.log.info ("Got client on " + JSON.stringify (type) + ': ' + JSON.stringify (add1)
-		       + ", " + JSON.stringify (add2)
-		       + ", " + JSON.stringify (add3)
-		       + ", " + JSON.stringify (add4));
+        this.log.info ("Got client on " + JSON.stringify (type) + ": " + JSON.stringify (add1)
+                + ", " + JSON.stringify (add2)
+                + ", " + JSON.stringify (add3)
+                + ", " + JSON.stringify (add4));
     }
 
     connectToDevice () {
-	// The port number and hostname of the server.
-	const port = this.config.port_number;
-	const host = this.config.net_address;
+        // The port number and hostname of the server.
+        const port = this.config.port_number;
+        const host = this.config.net_address;
 
-	// Create a new TCP client.
-	this._client = new Net.Socket();
+        // Create a new TCP client.
+        this._client = new Net.Socket();
 
-	// Send a connection request to the server.
-	this._client.on('connect', this.connectionEstablished.bind(this));
-	this._client.on('data', this.readFromDevice.bind(this));
-	this._client.on('end', this.clientOn.bind(this, 'end'));
-	this._client.on('error', this.clientOn.bind(this, 'error'));
-	this._client.on('close', this.clientOn.bind(this, 'close'));
+        // Send a connection request to the server.
+        this._client.on("connect", this.connectionEstablished.bind(this));
+        this._client.on("data", this.readFromDevice.bind(this));
+        this._client.on("end", this.clientOn.bind(this, "end"));
+        this._client.on("error", this.clientOn.bind(this, "error"));
+        this._client.on("close", this.clientOn.bind(this, "close"));
 
-	this._client.connect ({ port: port, host: host});
+        this._client.connect ({ port: port, host: host});
 
         // The client can also receive data from the server by reading from its socket.
         //client.on('data', function(chunk) {
-	//    console.log(`Data received from the server: ${chunk.toString()}.`);
-	    
-	//    // Request an end to the connection after the data has been received.
-	//    client.end();
-	//});
+        //    console.log(`Data received from the server: ${chunk.toString()}.`);
 
-	//client.on('end', function() {
-	//    console.log('Requested an end to the TCP connection');
-	//});
-	return;
-	axios({
-            method: 'get',
-            baseURL: 'https://data.sensor.community/airrohr/v1/sensor/',
-            url: '/' + sensorIdentifier.replace(/\D/g,'') + '/',
-            timeout: this.config.requestTimeout * 1000,
-            responseType: 'json'
-        }).then(
-            async (response) => {
-                const content = response.data;
+        //    // Request an end to the connection after the data has been received.
+        //    client.end();
+        //});
 
-                this.log.debug('remote request done');
-                this.log.debug('received data (' + response.status + '): ' + JSON.stringify(content));
-
-                await this.setStateAsync(path + 'responseCode', {val: response.status, ack: true});
-
-                if (content && Array.isArray(content) && content.length > 0) {
-                    const sensorData = content[0];
-
-                    if (sensorData && Object.prototype.hasOwnProperty.call(sensorData, 'sensordatavalues')) {
-                        for (const key in sensorData.sensordatavalues) {
-                            const obj = sensorData.sensordatavalues[key];
-
-                            let unit = null;
-                            let role = 'value';
-
-                            if (obj.value_type.indexOf('noise') >= 0) {
-                                unit = 'dB(A)';
-                                role = 'value';
-                            } else if (Object.prototype.hasOwnProperty.call(unitList, obj.value_type)) {
-                                unit = unitList[obj.value_type];
-                                role = roleList[obj.value_type];
-                            }
-
-                            await this.setObjectNotExistsAsync(path + 'SDS_' + obj.value_type, {
-                                type: 'state',
-                                common: {
-                                    name: obj.value_type,
-                                    type: 'number',
-                                    role: role,
-                                    unit: unit,
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            await this.setStateAsync(path + 'SDS_' + obj.value_type, {val: parseFloat(obj.value), ack: true});
-                        }
-                    }
-
-                    if (Object.prototype.hasOwnProperty.call(sensorData, 'location')) {
-                        await this.setObjectNotExistsAsync(path + 'location', {
-                            type: 'channel',
-                            common: {
-                                name: {
-                                    en: 'Location',
-                                    de: 'Standort',
-                                    ru: 'Место нахождения',
-                                    pt: 'Localização',
-                                    nl: 'Plaats',
-                                    fr: 'Emplacement',
-                                    it: 'Posizione',
-                                    es: 'Localización',
-                                    pl: 'Lokalizacja',
-                                    'zh-cn': '地点'
-                                },
-                                role: 'value.gps'
-                            }
-                        });
-
-                        await this.setObjectNotExistsAsync(path + 'location.longitude', {
-                            type: 'state',
-                            common: {
-                                name: {
-                                    en: 'Longtitude',
-                                    de: 'Längengrad',
-                                    ru: 'Долгота',
-                                    pt: 'Longitude',
-                                    nl: 'lengtegraad',
-                                    fr: 'Longitude',
-                                    it: 'longitudine',
-                                    es: 'Longitud',
-                                    pl: 'Długość geograficzna',
-                                    'zh-cn': '经度'
-                                },
-                                type: 'number',
-                                role: 'value.gps.longitude',
-                                unit: '°',
-                                read: true,
-                                write: false
-                            },
-                            native: {}
-                        });
-                        await this.setStateAsync(path + 'location.longitude', {val: parseFloat(sensorData.location.longitude), ack: true});
-                    }
-                }
-            }
-        ).catch(
-            (error) => {
-                if (error.response) {
-                    // The request was made and the server responded with a status code
-
-                    this.log.warn('received error ' + error.response.status + ' response from remote sensor ' + sensorIdentifier + ' with content: ' + JSON.stringify(error.response.data));
-                    this.setStateAsync(path + 'responseCode', {val: error.response.status, ack: true});
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                    // http.ClientRequest in node.js
-                    this.log.info(error.message);
-                    this.setStateAsync(path + 'responseCode', -1, true);
-                } else {
-                    // Something happened in setting up the request that triggered an Error
-                    this.log.info(error.message);
-                    this.setStateAsync(path + 'responseCode', -99, true);
-                }
-            }
-        );
+        //client.on('end', function() {
+        //    console.log('Requested an end to the TCP connection');
+        //});
+        return;
     }
 
     /**
@@ -277,6 +278,54 @@ class EpsonEscVp21 extends utils.Adapter {
             native: {},
         });
 
+        await this.setObjectNotExistsAsync("power_state", {
+            type: "state",
+            common: {
+                name: "power_state",
+                type: "string",
+                role: "mode",
+                read: true,
+                write: false,
+            },
+            native: {},
+        });
+
+        await this.setObjectNotExistsAsync("lamp_hours", {
+            type: "state",
+            common: {
+                name: "lamp_hours",
+                type: "number",
+                role: "value",
+                read: true,
+                write: false,
+            },
+            native: {},
+        });
+
+        await this.setObjectNotExistsAsync("source", {
+            type: "state",
+            common: {
+                name: "source",
+                type: "string",
+                role: "mode",
+                read: true,
+                write: false,
+            },
+            native: {},
+        });
+
+        await this.setObjectNotExistsAsync("volume", {
+            type: "state",
+            common: {
+                name: "volume",
+                type: "number",
+                role: "value",
+                read: true,
+                write: false,
+            },
+            native: {},
+        });
+
         // In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
         this.subscribeStates("power");
         // You can also add a subscription for multiple states. The following line watches all states starting with "lights."
@@ -305,7 +354,7 @@ class EpsonEscVp21 extends utils.Adapter {
         //result = await this.checkGroupAsync("admin", "admin");
         //this.log.info("check group user admin group admin: " + result);
 
-	this.connectToDevice ();
+        this.connectToDevice ();
     }
 
     /**
@@ -315,6 +364,9 @@ class EpsonEscVp21 extends utils.Adapter {
     onUnload(callback) {
         try {
             // Here you must clear all timeouts or intervals that may still be active
+            if (this._timer != null)
+                clearInterval (this._timer);
+
             // clearTimeout(timeout1);
             // clearTimeout(timeout2);
             // ...
@@ -351,7 +403,17 @@ class EpsonEscVp21 extends utils.Adapter {
     onStateChange(id, state) {
         if (state) {
             // The state was changed
-            this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+            if (!state.ack) {
+                if (state.val) {
+                    // Power on projector
+                    this.addCommand ("PWR ON\r");
+                } else {
+                    // Power off projector
+                    this.addCommand ("PWR OFF\r");
+                }
+
+                this.pollDeviceStatus ();
+            }
         } else {
             // The state was deleted
             this.log.info(`state ${id} deleted`);
