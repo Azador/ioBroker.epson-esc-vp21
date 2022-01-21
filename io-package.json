@@ -64,8 +64,8 @@
     },
     "native": {
         "net_address": "Beamer",
-        "port_number": "3629",
-        "poll_intervall": "20"
+        "port_number": 3629,
+        "poll_intervall": 20
     },
     "objects": [],
     "instanceObjects": [
