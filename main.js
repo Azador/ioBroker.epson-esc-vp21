@@ -13,6 +13,7 @@ const Net = require("net");
 // const fs = require("fs");
 
 const projector_name = "projector";
+const log_debug = false;
 
 const device_states = [
     {tag: "PWR",          name: "power_state",         common: { type: "string",  write: false, role: "state" }},
@@ -84,18 +85,33 @@ class EpsonEscVp21 extends utils.Adapter {
 
     addCommand (cmd) {
         this._pending_commands.push (cmd);
+        if (log_debug)
+            this.log.info ("Adding command at index " + String (this._pending_commands.length - 1));
         this.processNextCommand ();
     }
 
     processNextCommand () {
-        if (!(this._client instanceof Net.Socket))
+        if (!(this._client instanceof Net.Socket)) {
+            if (log_debug)
+                this.log.info ("Processing commands: Socket not initialized");
             return;
+        }
 
-        if (this._process_command  != null || this._pending_commands.length == 0)
+        if (this._process_command  !== null || this._pending_commands.length === 0) {
+            if (log_debug) {
+                if (this._process_command  !== null) {
+                    this.log.info ("Processing commands: waiting for current command: " + String (this._process_command));
+                } else {
+                    this.log.info ("Processing commands: no commands in queue");
+                }
+            }
             return;
+        }
 
         const cmd = this._pending_commands.shift ();
-        //this.log.info ("Set next command: " + cmd);
+        if (log_debug)
+            this.log.info ("Processing commands, still in queue: " + String (this._pending_commands.length) + ", next command: " +  cmd);
+
         this._process_command = cmd;
         this._client.write (cmd);
     }
@@ -120,6 +136,9 @@ class EpsonEscVp21 extends utils.Adapter {
     }
 
     gotValue (name, val) {
+        if (log_debug)
+            this.log.info ("Processing reply: " + String (name) + " " +  String (val));
+
         let handled = true;
 
         switch (name) {
@@ -154,7 +173,7 @@ class EpsonEscVp21 extends utils.Adapter {
                 break;
             }
 
-            case "IMEVENT":
+            case "IMEVENT": {
                 // IMEVENT: 0001 02 00000000 00000000 T1 F1
                 // IMEVENT = 0001 02 00000002 00000000 T1 F1
                 // IMEVENT: 0001 03 00000002 00000000 T1 F1
@@ -166,8 +185,37 @@ class EpsonEscVp21 extends utils.Adapter {
                 //           |    |      +---------------------- ?
                 //           |    +----------------------------- Lamp state?
                 //           +---------------------------------- Always 1?
-                this.log.info ("IMEVENT: " + val);
+                const a = val.split (" ");
+                let power_state = "unknown";
+                let power = false;
+                switch (a[1]) {
+                    case "00":
+                        power_state = "Standby, network off"; // How could I get this :)
+                        break;
+                    case "01":
+                        power_state = "Lamp on";
+                        power = true;
+                        break;
+                    case "02":
+                        power_state = "Warmup";
+                        power = true;
+                        break;
+                    case "03":
+                        power_state = "Cooldown";
+                        power = true;
+                        break;
+                    case "04":
+                        power_state = "Standby, network on";
+                        break;
+                    case "05":
+                        power_state = "Abnormality standby";
+                        break;
+                }
+                this.setState (projector_name + ".power_state", power_state, true);
+                this.setState (projector_name + ".power", power, true);
+
                 break;
+            }
 
             default:
                 handled = false;
@@ -193,11 +241,14 @@ class EpsonEscVp21 extends utils.Adapter {
             }
 
             if (!handled)
-                this.log.info ("Unknown value: " + name + " = " + val);
+                this.log.info ("Unknown reply: " + name + " = " + val);
         }
     }
 
     gotState (name) {
+        if (log_debug)
+            this.log.info ("Processing reply state: " + String (name));
+
         if (name == "ERR") {
             if (typeof this._process_command == "string" || this._process_command instanceof String) {
                 let handled = false;
@@ -220,27 +271,37 @@ class EpsonEscVp21 extends utils.Adapter {
                 }
 
                 if (!handled) {
-                    this.log.info ("Error for unknown cmd: " + this._process_command.slice (0, -1));
+                    this.log.warn ("Error reply for unknown cmd: " + this._process_command.slice (0, -1));
                 }
             } else {
-                this.log.info ("Error for not set cmd: " + JSON.stringify (this._process_command));
+                this.log.warn ("Error reply for not set cmd: " + JSON.stringify (this._process_command));
             }
         } else {
-            this.log.info ("Unknown state 2: " + name);
+            this.log.warn ("Error, unknown state: " + name);
         }
     }
 
     readFromDevice (data) {
-        if (this._process_command == null)
-            this.log.info ("Got spurious reply: " + JSON.stringify (data));
+        if (this._process_command == null) {
+            let spurious_reply = true;
+
+            if (data instanceof Buffer) {
+                const s = String.fromCharCode.apply (null, data);
+                if (s.startsWith ("IMEVENT"))
+                    spurious_reply = false;
+            }
+
+            if (spurious_reply)
+                this.log.warn ("Got unexpected spurious reply: " + JSON.stringify (data));
+        }
 
         if (data instanceof Buffer) {
             if (data.compare (Buffer.from ([69,83,67,47,86,80,46,110,101,116,16,3,0,0,32,0])) == 0) {
                 if (this._connected)
-                    this.log.info ("Got connection start string from projector while already connected");
+                    this.log.warn ("Got connection start string from projector while already connected");
 
                 if (this._process_command != "startup")
-                    this.log.info ("Got connection start string from projector while not waiting for it");
+                    this.log.warn ("Got connection start string from projector while not waiting for it");
 
                 this._connected = true;
                 this._process_command = null;
@@ -256,7 +317,9 @@ class EpsonEscVp21 extends utils.Adapter {
                 const a = s.split ("\r");
                 for (let i=0; i < a.length; ++i) {
                     if (a[i] == ":") {
-                        //this.log.info ("Ready for new commands");
+                        if (log_debug)
+                            this.log.info ("':' recieved, ready for new commands");
+
                         this._process_command = null;
                         this.processNextCommand ();
                     } else {
@@ -269,13 +332,13 @@ class EpsonEscVp21 extends utils.Adapter {
                         } else if (v.length == 1) {
                             this.gotState (v[0]);
                         } else
-                            this.log.info ("Reply " + JSON.stringify (v) + " not parsed");
+                            this.log.warn ("Got unexpected reply: " + JSON.stringify (v));
                     }
                 }
 
             }
         } else
-            this.log.info ("not Buffer?");
+            this.log.warn ("Got reply that is no instance of Buffer?");
     }
 
     clientOn (type, add1, add2, add3, add4) {
@@ -327,9 +390,11 @@ class EpsonEscVp21 extends utils.Adapter {
 
         // The adapters config (in the instance object everything under the attribute "native") is accessible via
         // this.config:
-        this.log.info("config net_address: " + this.config.net_address);
-        this.log.info("config port_number: " + this.config.port_number);
-        this.log.info("config poll_intervall: " + this.config.poll_intervall);
+        if (log_debug) {
+            this.log.info("config net_address: " + this.config.net_address);
+            this.log.info("config port_number: " + this.config.port_number);
+            this.log.info("config poll_intervall: " + this.config.poll_intervall);
+        }
 
         /*
         For every state in the system there has to be also an object of type state
@@ -458,7 +523,8 @@ class EpsonEscVp21 extends utils.Adapter {
         if (state) {
             // The state was changed
             if (!state.ack) {
-                this.log.info ("State changed: " + id + " = " + JSON.stringify (state.val));
+                if (log_debug)
+                    this.log.info ("State changed: " + id + " = " + JSON.stringify (state.val));
 
                 if (id == "projector.power") {
                     if (state.val) {
@@ -491,14 +557,14 @@ class EpsonEscVp21 extends utils.Adapter {
                     }
 
                     if (!handled)
-                        this.log.info ("Unhandled object: " + id + " = " + JSON.stringify (state.val));
+                        this.log.warn ("Unhandled object: " + id + " = " + JSON.stringify (state.val));
                 }
 
                 this.pollDeviceStatus ();
             }
         } else {
             // The state was deleted
-            this.log.info(`state ${id} deleted`);
+            this.log.warn (`state ${id} deleted`);
         }
     }
 
