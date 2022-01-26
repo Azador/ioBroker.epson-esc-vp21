@@ -286,6 +286,7 @@ class EpsonEscVp21 extends utils.Adapter {
             let spurious_reply = true;
 
             if (data instanceof Buffer) {
+                // @ts-ignore
                 const s = String.fromCharCode.apply (null, data);
                 if (s.startsWith ("IMEVENT"))
                     spurious_reply = false;
@@ -309,8 +310,10 @@ class EpsonEscVp21 extends utils.Adapter {
 
                 this.pollDeviceStatus ();
 
+                // @ts-ignore
                 this._timer = setInterval (this.pollDeviceStatus.bind (this), parseInt (this.config.poll_intervall) * 1000); // Sync Interval
             } else {
+                // @ts-ignore
                 const s = String.fromCharCode.apply (null, data);
                 //this.log.info ("Got reply: '" + s + "'");
 
@@ -432,6 +435,7 @@ class EpsonEscVp21 extends utils.Adapter {
                 write: device_states[i].common.write
             };
 
+            // @ts-ignore
             await this.setObjectNotExistsAsync(name, {
                 type: "state",
                 common: common,
