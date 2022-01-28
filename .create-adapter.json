@@ -44,10 +44,26 @@
             "defaultValue": "3629"
         },
         {
-            "key": "poll_intervall",
-            "label": "Poll intervall",
+            "key": "poll_interval",
+            "label": "Poll interval",
             "inputType": "number",
             "defaultValue": "20"
+        },
+        {
+            "key": "device_type",
+            "label": "Device type",
+            "inputType": "select",
+            "options": [
+                {
+                    "text": "general",
+                    "value": "general"
+                },
+                {
+                    "text": "Epson EH-TW5650",
+                    "value": "EHTW5650"
+                }
+            ],
+            "defaultValue": "general"
         }
     ],
     "language": "JavaScript",

@@ -38,8 +38,8 @@ systemDictionary = {
         "pl": "Numer portu",
         "zh-cn": "端口号"
     },
-    "poll_intervall": {
-        "en": "Poll intervall",
+    "poll_interval": {
+        "en": "Poll interval",
         "de": "Abfrageintervall",
         "ru": "Интервал опроса",
         "pt": "Intervalo de sondagem",

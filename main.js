@@ -80,6 +80,7 @@ class EpsonEscVp21 extends utils.Adapter {
         this.on("unload", this.onUnload.bind(this));
 
         this._timer = null;
+        this._interval = null;
         return;
     }
 
@@ -97,14 +98,20 @@ class EpsonEscVp21 extends utils.Adapter {
             return;
         }
 
-        if (this._process_command  !== null || this._pending_commands.length === 0) {
+        if (this._process_command  !== null) {
             if (log_debug) {
-                if (this._process_command  !== null) {
-                    this.log.info ("Processing commands: waiting for current command: " + String (this._process_command));
-                } else {
-                    this.log.info ("Processing commands: no commands in queue");
-                }
+                this.log.info ("Processing commands: waiting for current command: " + String (this._process_command));
             }
+            return;
+        }
+
+        if (this._pending_commands.length === 0) {
+            if (log_debug) {
+                this.log.info ("Processing commands: no commands in queue");
+            }
+
+            if (this._timer === null)
+                this._timer = setTimeout (this.pollDeviceStatusTimer.bind (this), this.config.poll_interval * 1000);
             return;
         }
 
@@ -129,10 +136,22 @@ class EpsonEscVp21 extends utils.Adapter {
         //this.client.write('ESC/VP.net' + String.fromCharCode.apply (null, [16, 3, 0, 0, 0, 0]));
     }
 
+    // Poll all device data points
     pollDeviceStatus () {
         for (const i in device_states) {
             this.addCommand (device_states[i].tag + "?\r");
         }
+    }
+
+    pollDeviceStatusTimer () {
+        this.pollDeviceStatus ();
+        this._timer = null;
+    }
+
+    // Fallback if we miss to set up the timer somewhere
+    pollDeviceStatusInterval () {
+        if (this._timer === null && this._pending_commands.length === 0)
+            this.pollDeviceStatus ();
     }
 
     gotValue (name, val) {
@@ -310,23 +329,24 @@ class EpsonEscVp21 extends utils.Adapter {
 
                 this.pollDeviceStatus ();
 
-                // @ts-ignore
-                this._timer = setInterval (this.pollDeviceStatus.bind (this), parseInt (this.config.poll_intervall) * 1000); // Sync Interval
+                this._interval = setInterval (this.pollDeviceStatusInterval.bind (this), this.config.poll_interval * 1000); // Sync Interval
             } else {
                 // @ts-ignore
                 const s = String.fromCharCode.apply (null, data);
                 //this.log.info ("Got reply: '" + s + "'");
 
                 const a = s.split ("\r");
+                let found_end = false;
                 for (let i=0; i < a.length; ++i) {
                     if (a[i] == ":") {
                         if (log_debug)
-                            this.log.info ("':' recieved, ready for new commands");
+                            this.log.info ("':' received, ready for new commands");
 
+                        found_end = true;
                         this._process_command = null;
                         this.processNextCommand ();
                     } else {
-                        if (a[0] == ":")
+                        while (a.length > 1 && a[0] == ":")
                             a.shift ();
 
                         const v = a[i].split ("=");
@@ -339,6 +359,13 @@ class EpsonEscVp21 extends utils.Adapter {
                     }
                 }
 
+                if (!found_end) {
+                    if (log_debug) {
+                        this.log.warn ("No ':' received but no further reply data exist. Start processing of next command");
+                    }
+
+                    this.processNextCommand ();
+                }
             }
         } else
             this.log.warn ("Got reply that is no instance of Buffer?");
@@ -396,7 +423,7 @@ class EpsonEscVp21 extends utils.Adapter {
         if (log_debug) {
             this.log.info("config net_address: " + this.config.net_address);
             this.log.info("config port_number: " + this.config.port_number);
-            this.log.info("config poll_intervall: " + this.config.poll_intervall);
+            this.log.info("config poll_interval: " + this.config.poll_interval);
         }
 
         /*
@@ -489,7 +516,9 @@ class EpsonEscVp21 extends utils.Adapter {
         try {
             // Here you must clear all timeouts or intervals that may still be active
             if (this._timer != null)
-                clearInterval (this._timer);
+                clearTimeout (this._timer);
+            if (this._interval != null)
+                clearInterval (this._interval);
 
             if (this._client instanceof Net.Socket)
                 this._client.end ();
