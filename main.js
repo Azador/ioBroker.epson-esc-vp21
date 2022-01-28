@@ -13,47 +13,47 @@ const Net = require("net");
 // const fs = require("fs");
 
 const projector_name = "projector";
-const log_debug = false;
+const log_debug = true; //false;
 
 const device_states = [
-    {tag: "PWR",          name: "power_state",         common: { type: "string",  write: false, role: "state" }},
-    {tag: "VKEYSTONE",    name: "vertical_keystone",   common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "HKEYSTONE",    name: "horizontal_keystone", common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "AUTOKEYSTONE", name: "auto_keystone",       common: { type: "boolean", write: true,  role: "switch", on: "ON", off: "OFF" }},
-    {tag: "ASPECT",       name: "aspect",              common: { type: "string",  write: false, role: "state" }},
-    {tag: "LUMINANCE",    name: "luminance",           common: { type: "number",  write: false, role: "switch" }},
-    {tag: "OVSCAN",       name: "ovscan",              common: { type: "number",  write: false, role: "state" }},
-    {tag: "SOURCE",       name: "source",              common: { type: "string",  write: false, role: "state" }},
-    {tag: "AUTOSEARCH",   name: "auto_source_search",  common: { type: "boolean", write: true,  role: "switch", on: "01", off: "00" }},
-    {tag: "BRIGHT",       name: "brightness",          common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "CONTRAST",     name: "contrast",            common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "DENSITY",      name: "density",             common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "TINT",         name: "tint",                common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "SHARP",        name: "sharpness",           common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "CTEMP",        name: "color_temperature",   common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "CMODE",        name: "color_mode",          common: { type: "string",  write: false, role: "state" }},
-    {tag: "HPOS",         name: "horizontal_position", common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "VPOS",         name: "vertical_position",   common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "TRACKiNG",     name: "tracking",            common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "SYNC",         name: "sync_value",          common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "NRS",          name: "noise_reduction_adj", common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "MPEGNRS",      name: "mpeg_noise_reduction",common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "OFFSETR",      name: "offset_value_red",    common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "OFFSETG",      name: "offset_value_green",  common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "OFFSETB",      name: "offset_value_blue",   common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "GAINR",        name: "gain_value_red",      common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "GAING",        name: "gain_value_green",    common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "GAINB",        name: "gain_value_blue",     common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "GAMMA",        name: "gamma",               common: { type: "string",  write: false, role: "state" }},
-    {tag: "DESTRENGTH",   name: "detail_enhancement",  common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
-    {tag: "MCFI",         name: "frame_interpolation", common: { type: "string",  write: false, role: "state" }},
-    {tag: "VOL",          name: "volume",              common: { type: "number" , write: true , role: "level.volume", min: 0, max: 255 }},
-    {tag: "HREVERSE",     name: "horizontal_reverse",  common: { type: "boolean", write: true,  role: "switch", on: "ON", off: "OFF" }},
-    {tag: "VREVERSE",     name: "vertical_reverse",    common: { type: "boolean", write: true,  role: "switch", on: "ON", off: "OFF" }},
-    {tag: "ILLUM",        name: "illumination",        common: { type: "boolean", write: true,  role: "switch", on: "01", off: "00" }},
-    {tag: "WDNAME",       name: "wfd_display_name",    common: { type: "string",  write: false, role: "state" }},
-    {tag: "LAMP",         name: "lamp_hours",          common: { type: "number" , write: false, role: "state" }},
-    {tag: "SNO",          name: "serial_number",       common: { type: "string",  write: false, role: "state" }},
+    {tag: "PWR",          name: "power_state",         poll_off: true,  dev_type: null, common: { type: "string",  write: false, role: "state" }},
+    {tag: "VKEYSTONE",    name: "vertical_keystone",   poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "HKEYSTONE",    name: "horizontal_keystone", poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "AUTOKEYSTONE", name: "auto_keystone",       poll_off: false, dev_type: null, common: { type: "boolean", write: true,  role: "switch", on: "ON", off: "OFF" }},
+    {tag: "ASPECT",       name: "aspect",              poll_off: false, dev_type: null, common: { type: "string",  write: false, role: "state" }},
+    {tag: "LUMINANCE",    name: "luminance",           poll_off: false, dev_type: null, common: { type: "number",  write: false, role: "switch" }},
+    {tag: "OVSCAN",       name: "ovscan",              poll_off: false, dev_type: null, common: { type: "number",  write: false, role: "state" }},
+    {tag: "SOURCE",       name: "source",              poll_off: false, dev_type: null, common: { type: "string",  write: false, role: "state" }},
+    {tag: "AUTOSEARCH",   name: "auto_source_search",  poll_off: false, dev_type: null, common: { type: "boolean", write: true,  role: "switch", on: "01", off: "00" }},
+    {tag: "BRIGHT",       name: "brightness",          poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "CONTRAST",     name: "contrast",            poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "DENSITY",      name: "density",             poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "TINT",         name: "tint",                poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "SHARP",        name: "sharpness",           poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "CTEMP",        name: "color_temperature",   poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "CMODE",        name: "color_mode",          poll_off: false, dev_type: null, common: { type: "string",  write: false, role: "state" }},
+    {tag: "HPOS",         name: "horizontal_position", poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "VPOS",         name: "vertical_position",   poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "TRACKiNG",     name: "tracking",            poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "SYNC",         name: "sync_value",          poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "NRS",          name: "noise_reduction_adj", poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "MPEGNRS",      name: "mpeg_noise_reduction",poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "OFFSETR",      name: "offset_value_red",    poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "OFFSETG",      name: "offset_value_green",  poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "OFFSETB",      name: "offset_value_blue",   poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "GAINR",        name: "gain_value_red",      poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "GAING",        name: "gain_value_green",    poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "GAINB",        name: "gain_value_blue",     poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "GAMMA",        name: "gamma",               poll_off: false, dev_type: null, common: { type: "string",  write: false, role: "state" }},
+    {tag: "DESTRENGTH",   name: "detail_enhancement",  poll_off: false, dev_type: null, common: { type: "number",  write: true,  role: "level", min: 0, max: 255 }},
+    {tag: "MCFI",         name: "frame_interpolation", poll_off: false, dev_type: null, common: { type: "string",  write: false, role: "state" }},
+    {tag: "VOL",          name: "volume",              poll_off: false, dev_type: null, common: { type: "number" , write: true , role: "level.volume", min: 0, max: 255 }},
+    {tag: "HREVERSE",     name: "horizontal_reverse",  poll_off: false, dev_type: null, common: { type: "boolean", write: true,  role: "switch", on: "ON", off: "OFF" }},
+    {tag: "VREVERSE",     name: "vertical_reverse",    poll_off: false, dev_type: null, common: { type: "boolean", write: true,  role: "switch", on: "ON", off: "OFF" }},
+    {tag: "ILLUM",        name: "illumination",        poll_off: false, dev_type: null, common: { type: "boolean", write: true,  role: "switch", on: "01", off: "00" }},
+    {tag: "WDNAME",       name: "wfd_display_name",    poll_off: false, dev_type: null, common: { type: "string",  write: false, role: "state" }},
+    {tag: "LAMP",         name: "lamp_hours",          poll_off: true,  dev_type: null, common: { type: "number" , write: false, role: "state" }},
+    {tag: "SNO",          name: "serial_number",       poll_off: true,  dev_type: null, common: { type: "string",  write: false, role: "state" }},
 ];
 
 
@@ -72,6 +72,7 @@ class EpsonEscVp21 extends utils.Adapter {
         this._pending_commands = [];
         this._process_command = null;
         this._connected = false;
+        this._power = false;
 
         this.on("ready", this.onReady.bind(this));
         this.on("stateChange", this.onStateChange.bind(this));
@@ -82,6 +83,18 @@ class EpsonEscVp21 extends utils.Adapter {
         this._timer = null;
         this._interval = null;
         return;
+    }
+
+    hasDevType (dev_type) {
+        if (dev_type === null)
+            return true;
+
+        for (let i=0; i < dev_type.length; ++i) {
+            if (this.config.device_type === dev_type[i])
+                return true;
+        }
+
+        return false;
     }
 
     addCommand (cmd) {
@@ -139,7 +152,8 @@ class EpsonEscVp21 extends utils.Adapter {
     // Poll all device data points
     pollDeviceStatus () {
         for (const i in device_states) {
-            this.addCommand (device_states[i].tag + "?\r");
+            if ((this._power || device_states[i].poll_off) && this.hasDevType (device_states[i].dev_type))
+                this.addCommand (device_states[i].tag + "?\r");
         }
     }
 
@@ -189,6 +203,7 @@ class EpsonEscVp21 extends utils.Adapter {
                 }
                 this.setState (projector_name + ".power_state", power_state, true);
                 this.setState (projector_name + ".power", power, true);
+                this._power = power;
                 break;
             }
 
@@ -232,7 +247,7 @@ class EpsonEscVp21 extends utils.Adapter {
                 }
                 this.setState (projector_name + ".power_state", power_state, true);
                 this.setState (projector_name + ".power", power, true);
-
+                this._power = power;
                 break;
             }
 
@@ -242,7 +257,7 @@ class EpsonEscVp21 extends utils.Adapter {
 
         if (!handled) {
             for (const i in device_states) {
-                if (name == device_states[i].tag) {
+                if (name == device_states[i].tag && this.hasDevType (device_states[i].dev_type)) {
                     if (device_states[i].common.type == "number") {
                         this.setState (projector_name + "." + device_states[i].name, parseInt (val), true);
                     } else if (device_states[i].common.type == "boolean") {
@@ -277,7 +292,7 @@ class EpsonEscVp21 extends utils.Adapter {
                     handled = true;
                 } else {
                     for (const i in device_states) {
-                        if (this._process_command.startsWith (device_states[i].tag + "?")) {
+                        if (this._process_command.startsWith (device_states[i].tag + "?") && this.hasDevType (device_states[i].dev_type)) {
                             if (device_states[i].common.type == "number" || device_states[i].common.type == "boolean") {
                                 this.setState (projector_name + "." + device_states[i].name, null, true);
                             } else {
@@ -339,8 +354,8 @@ class EpsonEscVp21 extends utils.Adapter {
                 let found_end = false;
                 for (let i=0; i < a.length; ++i) {
                     if (a[i] == ":") {
-                        if (log_debug)
-                            this.log.info ("':' received, ready for new commands");
+                        //if (log_debug)
+                        //    this.log.info ("':' received, ready for new commands");
 
                         found_end = true;
                         this._process_command = null;
@@ -420,6 +435,7 @@ class EpsonEscVp21 extends utils.Adapter {
 
         // The adapters config (in the instance object everything under the attribute "native") is accessible via
         // this.config:
+        this.log.info("config device_type: " + this.config.device_type);
         if (log_debug) {
             this.log.info("config net_address: " + this.config.net_address);
             this.log.info("config port_number: " + this.config.port_number);
@@ -440,10 +456,10 @@ class EpsonEscVp21 extends utils.Adapter {
             native: {},
         });
 
-        await this.setObjectNotExistsAsync("projector.power", {
+        await this.setObjectNotExistsAsync(projector_name + ".power", {
             type: "state",
             common: {
-                name: "projector.power",
+                name: projector_name + ".power",
                 type: "boolean",
                 role: "switch.power",
                 read: true,
@@ -453,27 +469,29 @@ class EpsonEscVp21 extends utils.Adapter {
         });
 
         for (const i in device_states) {
-            const name = projector_name + "." + device_states[i].name;
-            const common = {
-                name: name,
-                type: device_states[i].common.type,
-                role: device_states[i].common.role,
-                read: true,
-                write: device_states[i].common.write
-            };
+            if (this.hasDevType (device_states[i].dev_type)) {
+                const name = projector_name + "." + device_states[i].name;
+                const common = {
+                    name: name,
+                    type: device_states[i].common.type,
+                    role: device_states[i].common.role,
+                    read: true,
+                    write: device_states[i].common.write
+                };
 
-            // @ts-ignore
-            await this.setObjectNotExistsAsync(name, {
-                type: "state",
-                common: common,
-                native: {},
-            });
+                // @ts-ignore
+                await this.setObjectNotExistsAsync(name, {
+                    type: "state",
+                    common: common,
+                    native: {},
+                });
+            }
         }
 
         // In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
         this.subscribeStates (projector_name + ".power");
         for (const i in device_states) {
-            if (device_states[i].common.write) {
+            if (device_states[i].common.write && this.hasDevType (device_states[i].dev_type)) {
                 const name = projector_name + "." + device_states[i].name;
                 this.subscribeStates (name);
             }
@@ -571,7 +589,7 @@ class EpsonEscVp21 extends utils.Adapter {
                     let handled = false;
                     for (const i in device_states) {
                         const name = projector_name + "." + device_states[i].name;
-                        if (id == name) {
+                        if (id === name && this.hasDevType (device_states[i].dev_type)) {
                             if (device_states[i].common.type == "number" || device_states[i].common.type == "string") {
                                 this.addCommand (device_states[i].tag + " " + String (state.val) + "\r");
                                 handled = true;

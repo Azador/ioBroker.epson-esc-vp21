@@ -55,15 +55,15 @@
             "inputType": "select",
             "options": [
                 {
-                    "text": "general",
-                    "value": "general"
+                    "text": "generic",
+                    "value": "generic"
                 },
                 {
                     "text": "Epson EH-TW5650",
                     "value": "EHTW5650"
                 }
             ],
-            "defaultValue": "general"
+            "defaultValue": "generic"
         }
     ],
     "language": "JavaScript",
