@@ -13,7 +13,7 @@ const Net = require("net");
 // const fs = require("fs");
 
 const projector_name = "projector";
-const log_debug = true; //false;
+const log_debug = false;
 
 const device_states = [
     {tag: "PWR",          name: "power_state",         poll_off: true,  dev_type: null, common: { type: "string",  write: false, role: "state" }},
