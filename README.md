@@ -84,7 +84,7 @@ For later updates, the above procedure is not necessary. Just do the following:
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.1.0 (2022-04-12)
 * (Azador) initial release
 
 ## License
