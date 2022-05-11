@@ -2,3 +2,4 @@ test
 .github
 .gitignore
 .npmignore
+tsconfig.json
