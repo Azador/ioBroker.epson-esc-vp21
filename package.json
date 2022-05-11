@@ -54,6 +54,7 @@
     "lib/",
     "www/",
     "io-package.json",
+    "package.json",
     "LICENSE",
     "main.js"
   ],
