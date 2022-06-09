@@ -1,0 +1,8 @@
+{
+    "epson-esc-vp21 adapter settings": "epson-esc-vp21的适配器设置",
+    "Network address": "网络地址",
+    "IP or hostname of your Epson projector": "爱普生投影仪的 IP 或主机名",
+    "Port number": "端口号",
+    "Poll interval": "轮询间隔",
+    "Device type": "设备类型"
+}

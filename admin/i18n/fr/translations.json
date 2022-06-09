@@ -1,0 +1,8 @@
+{
+    "epson-esc-vp21 adapter settings": "Paramètres d'adaptateur pour epson-esc-vp21",
+    "Network address": "Adresse réseau",
+    "IP or hostname of your Epson projector": "IP ou nom d'hôte de votre projecteur Epson",
+    "Port number": "Numéro de port",
+    "Poll interval": "Intervalle de sondage",
+    "Device type": "Type d'appareil"
+}

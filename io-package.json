@@ -42,16 +42,16 @@
             "zh-cn": "爱普生投影仪通过 ESC/VP21"
         },
         "desc": {
-            "en": "Adapter for Epson projectors with ESC/VP21 support over wifi (e.g. EH-TW5650)",
-            "de": "Adapter für Epson-Projektoren mit ESC/VP21-Unterstützung über WLAN (z. B. EH-TW5650)",
-            "ru": "Адаптер для проекторов Epson с поддержкой ESC/VP21 через Wi-Fi (например, EH-TW5650)",
-            "pt": "Adaptador para projetores Epson com suporte ESC/VP21 via wifi (por exemplo, EH-TW5650)",
-            "nl": "Adapter voor Epson-projectoren met ESC/VP21-ondersteuning via wifi (bijv. EH-TW5650)",
-            "fr": "Adaptateur pour projecteurs Epson avec prise en charge ESC/VP21 via Wi-Fi (par exemple EH-TW5650)",
-            "it": "Adattatore per proiettori Epson con supporto ESC/VP21 tramite Wi-Fi (es. EH-TW5650)",
-            "es": "Adaptador para proyectores Epson con soporte ESC/VP21 a través de wifi (por ejemplo, EH-TW5650)",
-            "pl": "Adapter do projektorów Epson z obsługą ESC/VP21 przez Wi-Fi (np. EH-TW5650)",
-            "zh-cn": "通过 wifi 支持 ESC/VP21 的 Epson 投影仪适配器（例如 EH-TW5650）"
+            "en": "Adapter for Epson projectors with ESC/VP21 support via WiFi (e.g. EH-TW5650)",
+            "de": "Adapter für Epson-Projektoren mit ESC/VP21 Unterstützung über WLAN (z.B. EH-TW5650)",
+            "ru": "Адаптер для проекторов Epson с поддержкой ESC/VP21 через WiFi (например, EH-TW5650)",
+            "pt": "Adaptador para projetores Epson com suporte ESC/VP21 via WiFi (por exemplo, EH-TW5650)",
+            "nl": "Adapter voor Epson-projectoren met ESC/VP21-ondersteuning via WiFi (bijv. EH-TW5650)",
+            "fr": "Adaptateur pour projecteurs Epson avec prise en charge ESC/VP21 via WiFi (par exemple EH-TW5650)",
+            "it": "Adattatore per proiettori Epson con supporto ESC/VP21 tramite WiFi (es. EH-TW5650)",
+            "es": "Adaptador para proyectores Epson con soporte ESC/VP21 vía WiFi (ej. EH-TW5650)",
+            "pl": "Adapter do projektorów Epson z obsługą ESC/VP21 przez WiFi (np. EH-TW5650)",
+            "zh-cn": "通过 WiFi 支持 ESC/VP21 的 Epson 投影仪适配器（例如 EH-TW5650）"
         },
         "authors": [
             "Azador <github@lobo.uber.space>"
@@ -59,7 +59,10 @@
         "keywords": [
             "epson",
             "projector",
-            "wifi"
+            "wifi",
+            "iobroker",
+            "esc-vp21",
+            "iobroker-adapter"
         ],
         "license": "MIT",
         "platform": "Javascript/Node.js",
@@ -73,12 +76,19 @@
         "type": "multimedia",
         "compact": true,
         "connectionType": "local",
-        "dataSource": "poll",
+        "dataSource": "push",
         "materialize": true,
-        "supportCustoms": true,
+        "adminUI": {
+            "config": "json"
+        },
         "dependencies": [
             {
                 "js-controller": ">=2.0.0"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=5.1.28"
             }
         ]
     },
@@ -94,7 +104,18 @@
             "_id": "info",
             "type": "channel",
             "common": {
-                "name": "Information"
+                "name": {
+                    "en": "Information",
+                    "de": "Informationen",
+                    "ru": "Информация",
+                    "pt": "Informação",
+                    "nl": "Informatie",
+                    "fr": "Information",
+                    "it": "Informazioni",
+                    "es": "Información",
+                    "pl": "Informacja",
+                    "zh-cn": "信息"
+                  }
             },
             "native": {}
         },
@@ -103,7 +124,18 @@
             "type": "state",
             "common": {
                 "role": "indicator.connected",
-                "name": "Device or service connected",
+                "name": {
+                    "en": "Device or service connected",
+                    "de": "Geräte oder Dienst verbunden",
+                    "ru": "Устройство или сервис подключены",
+                    "pt": "Dispositivo ou serviço conectado",
+                    "nl": "Device of dienst verbonden",
+                    "fr": "Appareil ou service connecté",
+                    "it": "Dispositivo o servizio collegato",
+                    "es": "Dispositivo o servicio conectado",
+                    "pl": "Device",
+                    "zh-cn": "证人或有关服务"
+                  },
                 "type": "boolean",
                 "read": true,
                 "write": false,

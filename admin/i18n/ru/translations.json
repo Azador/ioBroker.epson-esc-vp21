@@ -1,0 +1,8 @@
+{
+    "epson-esc-vp21 adapter settings": "Настройки адаптера для epson-esc-vp21",
+    "Network address": "Сетевой адрес",
+    "IP or hostname of your Epson projector": "IP-адрес или имя хоста вашего проектора Epson",
+    "Port number": "Номер порта",
+    "Poll interval": "Интервал опроса",
+    "Device type": "Тип устройства"
+}
