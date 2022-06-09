@@ -1,6 +1,6 @@
 {
   "name": "iobroker.epson-esc-vp21",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Adapter for Epson projectors with ESC/VP21 support via WiFi (e.g. EH-TW5650)",
   "author": {
     "name": "Azador",
