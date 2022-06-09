@@ -103,6 +103,9 @@ Please refer to the [`dev-server` documentation](https://github.com/ioBroker/dev
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+* (Azador) New patch for testing release script
+
 ### 0.1.1 (2022-06-09)
 * (Azador) npm integration
 * (Azador) Changed to Admin 5 configuration
