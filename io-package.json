@@ -28,7 +28,6 @@
                 "zh-cn": "首次出版"
             }
         },
-        "title": "Epson Projector via ESC/VP21",
         "titleLang": {
             "en": "Epson Projector via ESC/VP21",
             "de": "Epson Projektor über ESC/VP21",
@@ -60,9 +59,7 @@
             "epson",
             "projector",
             "wifi",
-            "iobroker",
-            "esc-vp21",
-            "iobroker-adapter"
+            "esc-vp21"
         ],
         "license": "MIT",
         "platform": "Javascript/Node.js",
