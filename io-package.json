@@ -163,6 +163,48 @@
                 "def": false
             },
             "native": {}
+        },
+        {
+            "_id": "projector",
+            "type": "device",
+            "common": {
+                "name": {
+                    "en": "projector",
+                    "de": "Projektor",
+                    "ru": "проектор",
+                    "pt": "projetor",
+                    "nl": "projector",
+                    "fr": "projecteur",
+                    "it": "proiettore",
+                    "es": "proyector",
+                    "pl": "projektor",
+                    "zh-cn": "项目"
+                  }
+            },
+            "native": {}
+        },
+        {
+            "_id": "projector.state",
+            "type": "state",
+            "common": {
+                "name": {
+                    "en": "Switch state",
+                    "de": "Schaltzustand",
+                    "ru": "Switch состояние",
+                    "pt": "Estado de comutação",
+                    "nl": "Vertaling:",
+                    "fr": "État de commutation",
+                    "it": "Stato di commutazione",
+                    "es": "Estado de conmutación",
+                    "pl": "Switch state",
+                    "zh-cn": "奇怪州"
+                  },
+                "type": "boolean",
+                "role": "switch.power",
+                "read": true,
+                "write": true
+            },
+            "native": {}
         }
     ]
 }
