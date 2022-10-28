@@ -489,10 +489,10 @@ class EpsonEscVp21 extends utils.Adapter {
         }
 
         // In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
-        this.subscribeStates (projector_name + ".power");
+        this.subscribeStates (projector_name + ".state");
         for (const i in device_states) {
             if (device_states[i].common.write && this.hasDevType (device_states[i].dev_type)) {
-                const name = projector_name + "." + device_states[i].name;
+                const name = projector_name + "." + device_states[i].id;
                 this.subscribeStates (name);
             }
         }
@@ -588,7 +588,7 @@ class EpsonEscVp21 extends utils.Adapter {
                 } else {
                     let handled = false;
                     for (const i in device_states) {
-                        const name = projector_name + "." + device_states[i].name;
+                        const name = projector_name + "." + device_states[i].id;
                         if (id === name && this.hasDevType (device_states[i].dev_type)) {
                             if (device_states[i].common.type == "number" || device_states[i].common.type == "string") {
                                 this.addCommand (device_states[i].tag + " " + String (state.val) + "\r");
