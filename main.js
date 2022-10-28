@@ -259,15 +259,15 @@ class EpsonEscVp21 extends utils.Adapter {
             for (const i in device_states) {
                 if (name == device_states[i].tag && this.hasDevType (device_states[i].dev_type)) {
                     if (device_states[i].common.type == "number") {
-                        this.setState (projector_name + "." + device_states[i].name, parseInt (val), true);
+                        this.setState (projector_name + "." + device_states[i].id, parseInt (val), true);
                     } else if (device_states[i].common.type == "boolean") {
                         let v = false;
                         if (val == "1" || val == "ON" || val == "01")
                             v = true;
 
-                        this.setState (projector_name + "." + device_states[i].name, v, true);
+                        this.setState (projector_name + "." + device_states[i].id, v, true);
                     } else {
-                        this.setState (projector_name + "." + device_states[i].name, val, true);
+                        this.setState (projector_name + "." + device_states[i].id, val, true);
                     }
 
                     handled = true;
@@ -294,9 +294,9 @@ class EpsonEscVp21 extends utils.Adapter {
                     for (const i in device_states) {
                         if (this._process_command.startsWith (device_states[i].tag + "?") && this.hasDevType (device_states[i].dev_type)) {
                             if (device_states[i].common.type == "number" || device_states[i].common.type == "boolean") {
-                                this.setState (projector_name + "." + device_states[i].name, null, true);
+                                this.setState (projector_name + "." + device_states[i].id, null, true);
                             } else {
-                                this.setState (projector_name + "." + device_states[i].name, "n/a", true);
+                                this.setState (projector_name + "." + device_states[i].id, "n/a", true);
                             }
 
                             handled = true;
