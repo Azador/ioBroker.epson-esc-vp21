@@ -54,6 +54,9 @@ const device_states = [
     {tag: "WDNAME",       id: "wfd_display_name",    name: "WFD display name",    poll_off: false, dev_type: null, common: { type: "string",  write: false, role: "state" }},
     {tag: "LAMP",         id: "lamp_hours",          name: "Lamp hours",          poll_off: true,  dev_type: null, common: { type: "number" , write: false, role: "state" }},
     {tag: "SNO",          id: "serial_number",       name: "Serial number",       poll_off: true,  dev_type: null, common: { type: "string",  write: false, role: "state" }},
+
+    {tag: "ZOOM",         id: "zoom",                name: "Zoom",                poll_off: false, dev_type: ["EHLS12000"], common: { type: "number",  write: true, role: "level", min: 0, max: 1023 }},
+    {tag: "FOCUS",        id: "focus",               name: "Focus",               poll_off: false, dev_type: ["EHLS12000"], common: { type: "number",  write: true, role: "level", min: 0, max: 1023 }},
 ];
 
 
