@@ -179,7 +179,7 @@
                     "es": "proyector",
                     "pl": "projektor",
                     "zh-cn": "项目"
-                  }
+                }
             },
             "native": {}
         },
@@ -198,7 +198,7 @@
                     "es": "Estado de conmutación",
                     "pl": "Switch state",
                     "zh-cn": "奇怪州"
-                  },
+                },
                 "type": "boolean",
                 "role": "switch.power",
                 "read": true,

@@ -102,6 +102,10 @@ Please refer to the [`dev-server` documentation](https://github.com/ioBroker/dev
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (Azador) Removed problem with test:integration
+* (Azador) Added new projector Epson EH-LS12000 and objects zoom and focus for this projector
+
 ### 0.1.2 (2022-06-09)
 * (Azador) New patch for testing release script
 
