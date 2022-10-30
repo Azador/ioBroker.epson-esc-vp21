@@ -31,6 +31,7 @@ Several data points are only returned by the projector, if it is switched on (e.
 ### **WORK IN PROGRESS**
 * (Azador) Cleanup of change log.
 * (Azador) Cleanup of README.
+* (Azador) Added further support for Epson EH-LS12000.
 
 ### 0.1.5 (2022-10-30)
 * (Azador) Added release script plugins for iobroker and license
