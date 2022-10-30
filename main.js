@@ -389,7 +389,7 @@ class EpsonEscVp21 extends utils.Adapter {
             this.log.warn ("Got reply that is no instance of Buffer?");
     }
 
-    clientOn (type, add1, add2, add3, add4) {
+    clientOn (type, add1 , add2, add3, add4) {
         this.log.info ("Got client on " + JSON.stringify (type) + ": " + JSON.stringify (add1)
                 + ", " + JSON.stringify (add2)
                 + ", " + JSON.stringify (add3)
@@ -407,9 +407,9 @@ class EpsonEscVp21 extends utils.Adapter {
         // Send a connection request to the server.
         this._client.on("connect", this.connectionEstablished.bind(this));
         this._client.on("data", this.readFromDevice.bind(this));
-        this._client.on("end", this.clientOn.bind(this, "end"));
-        this._client.on("error", this.clientOn.bind(this, "error"));
-        this._client.on("close", this.clientOn.bind(this, "close"));
+        //this._client.on("end", this.clientOn.bind(this, "end"));
+        //this._client.on("error", this.clientOn.bind(this, "error"));
+        //this._client.on("close", this.clientOn.bind(this, "close"));
 
         this._client.connect ({ port: port, host: host});
 
