@@ -102,7 +102,7 @@ Please refer to the [`dev-server` documentation](https://github.com/ioBroker/dev
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 0.1.5 (2022-10-30)
 * (Azador) Next round in testing the release script...
 
 ### 0.1.4 (2022-10-30)
