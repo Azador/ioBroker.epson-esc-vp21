@@ -407,9 +407,9 @@ class EpsonEscVp21 extends utils.Adapter {
         // Send a connection request to the server.
         this._client.on("connect", this.connectionEstablished.bind(this));
         this._client.on("data", this.readFromDevice.bind(this));
-        //this._client.on("end", this.clientOn.bind(this, "end"));
-        //this._client.on("error", this.clientOn.bind(this, "error"));
-        //this._client.on("close", this.clientOn.bind(this, "close"));
+        this._client.on("end", this.clientOn.bind(this, "end"));
+        this._client.on("error", this.clientOn.bind(this, "error"));
+        this._client.on("close", this.clientOn.bind(this, "close"));
 
         this._client.connect ({ port: port, host: host});
 
