@@ -27,11 +27,16 @@ Several data points are only returned by the projector, if it is switched on (e.
 <!--
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
+
 -->
+### **WORK IN PROGRESS**
+* (Azador) Bump @iobroker/testing from 3.0.2 to 4.1.0
+
 ### 0.1.6 (2022-11-04)
 * (Azador) Cleanup of change log.
 * (Azador) Cleanup of README.
 * (Azador) Added further support for Epson EH-LS12000.
+* (Azador) Some bug fixes.
 
 ### 0.1.5 (2022-10-30)
 * (Azador) Added release script plugins for iobroker and license
