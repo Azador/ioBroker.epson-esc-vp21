@@ -587,7 +587,7 @@ class EpsonEscVp21 extends utils.Adapter {
                 if (log_debug)
                     this.log.info ("State changed: " + id + " = " + JSON.stringify (state.val));
 
-                if (id == "projector.power") {
+                if (id == "projector.state") {
                     if (state.val) {
                         // Power on projector
                         this.addCommand ("PWR ON\r");
@@ -599,6 +599,7 @@ class EpsonEscVp21 extends utils.Adapter {
                     let handled = false;
                     for (const i in device_states) {
                         const name = projector_name + "." + device_states[i].id;
+                        //this.log.debug ("Check id '" + id + "' === '" + name + "'");
                         if (id === name && this.hasDevType (device_states[i].dev_type)) {
                             if (device_states[i].common.type == "number" || device_states[i].common.type == "string") {
                                 this.addCommand (device_states[i].tag + " " + String (state.val) + "\r");
