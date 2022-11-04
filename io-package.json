@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "epson-esc-vp21",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "news": {
+      "0.1.6": {
+        "en": "Cleanup of change log.\nCleanup of README.\nAdded further support for Epson EH-LS12000.",
+        "de": "Reinigung von Change Log.\nReinigung von README.\nWeitere Unterstützung für Epson EH-LS12000.",
+        "ru": "Очистка лога изменений.\nОчистка README.\nДобавлена дополнительная поддержка Epson EH-LS12000.",
+        "pt": "Limpeza do log de mudança.\nLimpeza de README.\nAdicionado suporte adicional para Epson EH-LS12000.",
+        "nl": "Schoonmaak van veranderingslog.\nOpruimen.\nVerder ondersteuning voor Epson EH-LS12.000.",
+        "fr": "Nettoyage du journal de change.\nNettoyage du README.\nAjout d'un soutien supplémentaire pour Epson EH-LS12000.",
+        "it": "Pulizia del registro delle modifiche.\nPulizia di README.\nAggiunto ulteriore supporto per Epson EH-LS12000.",
+        "es": "Limpieza del registro de cambios.\nLimpieza de README.\nSe agregó más apoyo para Epson EH-LS12000.",
+        "pl": "Wspomnienia dotyczące zmiany logiki.\nWykład README.\nWspierał Epson EH-LS12000.",
+        "uk": "Очищення журналу змін.\nОчищення РЕАДМЕ.\nДодано подальшу підтримку Epson EH-LS12000.",
+        "zh-cn": "修改逻辑的清洁。.\n清洁中小企业。.\n进一步支持Epson EH-LS12000。."
+      },
       "0.1.5": {
         "en": "Testing the release process",
         "de": "Prüfung des Freisetzungsprozesses",
