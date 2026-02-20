@@ -69,7 +69,8 @@
     "translate": "translate-adapter",
     "release": "release-script patch --yes",
     "release-minor": "release-script minor --yes",
-    "release-major": "release-script major --yes"
+    "release-major": "release-script major --yes",
+    "publish": "release-script publish"
   },
   "bugs": {
     "url": "https://github.com/Azador/ioBroker.epson-esc-vp21/issues"
