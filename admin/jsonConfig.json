@@ -36,8 +36,9 @@
                     "type": "select",
                     "label": "Device type",
                     "options": [
-                        {"label": {"en": "generic"}, "value": "generic"},
-                        {"label": {"en": "EHTW5650"}, "value": "EHTW5650"}
+                        {"label": {"en": "Generic"}, "value": "generic"},
+                        {"label": {"en": "Epson EH-TW5650"}, "value": "EHTW5650"},
+                        {"label": {"en": "Epson EH-LS12000"}, "value": "EHLS12000"}
                     ]
                 }
             }
