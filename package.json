@@ -1,6 +1,6 @@
 {
   "name": "iobroker.epson-esc-vp21",
-  "version": "0.1.2",
+  "version": "0.1.6",
   "description": "Adapter for Epson projectors with ESC/VP21 support via WiFi (e.g. EH-TW5650)",
   "author": {
     "name": "Azador",
@@ -26,27 +26,29 @@
     "url": "git@github.com:Azador/ioBroker.epson-esc-vp21.git"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.6.6"
+    "@iobroker/adapter-core": "^3.1.6"
   },
   "devDependencies": {
-    "@alcalzone/release-script": "^3.5.9",
-    "@iobroker/adapter-dev": "^1.1.0",
-    "@iobroker/testing": "^4.1.0",
-    "@types/chai": "^4.3.3",
-    "@types/chai-as-promised": "^7.1.5",
-    "@types/mocha": "^10.0.0",
-    "@types/node": "^18.8.1",
-    "@types/proxyquire": "^1.3.28",
-    "@types/sinon": "^10.0.13",
-    "@types/sinon-chai": "^3.2.8",
-    "chai": "^4.3.6",
-    "chai-as-promised": "^7.1.1",
-    "eslint": "^8.24.0",
-    "mocha": "^10.0.0",
+    "@alcalzone/release-script": "^3.8.0",
+    "@alcalzone/release-script-plugin-iobroker": "^3.7.2",
+    "@alcalzone/release-script-plugin-license": "^3.7.0",
+    "@iobroker/adapter-dev": "^1.3.0",
+    "@iobroker/testing": "^4.1.3",
+    "@types/chai": "^4.3.11",
+    "@types/chai-as-promised": "^7.1.8",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^22.0.2",
+    "@types/proxyquire": "^1.3.31",
+    "@types/sinon": "^17.0.3",
+    "@types/sinon-chai": "^3.2.12",
+    "chai": "^4.5.0",
+    "chai-as-promised": "^8.0.0",
+    "eslint": "^9.9.0",
+    "mocha": "^10.7.3",
     "proxyquire": "^2.1.3",
-    "sinon": "^14.0.0",
+    "sinon": "^18.0.0",
     "sinon-chai": "^3.7.0",
-    "typescript": "~4.8.4"
+    "typescript": "~5.5.4"
   },
   "main": "main.js",
   "files": [
@@ -61,7 +63,6 @@
   "scripts": {
     "test:js": "mocha --config test/mocharc.custom.json \"{!(node_modules|test)/**/*.test.js,*.test.js,test/**/test!(PackageFiles|Startup).js}\"",
     "test:package": "mocha test/package --exit",
-    "test:unit": "mocha test/unit --exit",
     "test:integration": "mocha test/integration --exit",
     "test": "npm run test:js && npm run test:package",
     "check": "tsc --noEmit -p tsconfig.check.json",
