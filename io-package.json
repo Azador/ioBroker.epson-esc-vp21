@@ -99,7 +99,10 @@
       "wifi",
       "esc-vp21"
     ],
-    "license": "MIT",
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
     "platform": "Javascript/Node.js",
     "main": "main.js",
     "icon": "epson-esc-vp21.png",
@@ -109,6 +112,7 @@
     "loglevel": "info",
     "mode": "daemon",
     "type": "multimedia",
+    "tier": 3,
     "compact": true,
     "connectionType": "local",
     "dataSource": "push",

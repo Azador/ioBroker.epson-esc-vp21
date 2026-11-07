@@ -60,6 +60,11 @@ Values that the projector does not support are set to `null` (numbers, switches)
     ### **WORK IN PROGRESS**
 
 -->
+### **WORK IN PROGRESS**
+* (Azador) Requires Node.js >= 22 (Node.js 20 is end of life)
+* (Azador) Updated dependencies
+* (Azador) Added tier and licenseInformation to io-package.json
+
 ### 0.2.0 (2026-11-07)
 * (Azador) Automatic reconnect (with backoff) when the connection to the projector is lost
 * (Azador) Robust parsing of replies split or merged by TCP, timeout for unanswered commands
