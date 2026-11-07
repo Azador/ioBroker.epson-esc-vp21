@@ -61,7 +61,7 @@ Values that the projector does not support are set to `null` (numbers, switches)
 
 -->
 ### **WORK IN PROGRESS**
-* (Azador) Requires Node.js >= 22 (Node.js 20 is end of life)
+* (Azador) Requires Node.js >= 22 (Node.js 20 is end of life) and js-controller >= 7.2.2
 * (Azador) Updated dependencies
 * (Azador) Added tier and licenseInformation to io-package.json
 
