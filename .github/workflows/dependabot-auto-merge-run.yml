@@ -1,0 +1,39 @@
+# Dependabot auto-merge, stage 2 of 2:
+# Merges a Dependabot PR marked with the label "automerge" (see dependabot-auto-merge.yml)
+# after "Test and Release" succeeded for it.
+#
+# No code of the PR is checked out or executed here, only the GitHub CLI is used.
+
+name: Dependabot auto-merge (merge)
+
+on:
+  workflow_run:
+    workflows: ["Test and Release"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge PR if marked for auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          pr=$(gh pr list --repo "$REPO" --head "$HEAD_BRANCH" --state open --label automerge --json number --jq '.[0].number // empty')
+          if [ -z "$pr" ]; then
+            echo "No open PR with label automerge for branch $HEAD_BRANCH, nothing to do."
+            exit 0
+          fi
+          # --match-head-commit: only merge exactly the commit that was tested
+          gh pr merge "$pr" --repo "$REPO" --squash --delete-branch --match-head-commit "$HEAD_SHA"
