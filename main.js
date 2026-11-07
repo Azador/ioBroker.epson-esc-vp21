@@ -6,6 +6,7 @@
 
 const utils = require("@iobroker/adapter-core");
 const Net = require("net");
+const { decodePower, enqueueCommand, extractReplies } = require("./lib/protocol");
 
 const projector_name = "projector";
 
@@ -75,39 +76,6 @@ const device_states = [
     {tag: "ONTIME",       id: "operation_time",        name: "Operation time",                     poll_off: true,  dev_type: ["EHLS12000"], common: { type: "number" , write: false, role: "state" }},
 ];
 
-/**
- * Maps the power value of PWR / IMEVENT replies to a readable state.
- * @param {string} val
- * @returns {{power_state: string, power: boolean}}
- */
-function decodePower(val) {
-    switch (val) {
-        case "00": return { power_state: "Standby, network off", power: false };
-        case "01": return { power_state: "Lamp on", power: true };
-        case "02": return { power_state: "Warmup", power: true };
-        case "03": return { power_state: "Cooldown", power: true };
-        case "04": return { power_state: "Standby, network on", power: false };
-        case "05": return { power_state: "Abnormality standby", power: false };
-        default: return { power_state: "unknown", power: false };
-    }
-}
-
-/**
- * @param {string} cmd
- * @returns {boolean} true if the command is a query ("TAG?\r")
- */
-function isQuery(cmd) {
-    return cmd.endsWith("?\r");
-}
-
-/**
- * @param {string} cmd
- * @returns {string} the tag of a command, e.g. "BRIGHT" for "BRIGHT 120\r"
- */
-function commandTag(cmd) {
-    return cmd.replace(/[?\r].*$/s, "").split(" ")[0];
-}
-
 class EpsonEscVp21 extends utils.Adapter {
 
     /**
@@ -130,7 +98,15 @@ class EpsonEscVp21 extends utils.Adapter {
         this._rx = "";
         this._unloading = false;
         this._consecutive_timeouts = 0;
-        this._reconnect_delay = RECONNECT_MIN_DELAY_MS;
+        // Timing values, instance fields so that tests can shorten them
+        this._timing = {
+            handshake_timeout: HANDSHAKE_TIMEOUT_MS,
+            command_timeout: COMMAND_TIMEOUT_MS,
+            power_command_timeout: POWER_COMMAND_TIMEOUT_MS,
+            reconnect_min_delay: RECONNECT_MIN_DELAY_MS,
+            reconnect_max_delay: RECONNECT_MAX_DELAY_MS,
+        };
+        this._reconnect_delay = this._timing.reconnect_min_delay;
 
         /** @type {NodeJS.Timeout | null} */
         this._poll_timer = null;
@@ -163,19 +139,7 @@ class EpsonEscVp21 extends utils.Adapter {
      * @param {string} cmd
      */
     addCommand(cmd) {
-        if (isQuery(cmd)) {
-            if (!this._pending_commands.includes(cmd))
-                this._pending_commands.push(cmd);
-        } else {
-            const tag = commandTag(cmd);
-            this._pending_commands = this._pending_commands.filter((c) => isQuery(c) || commandTag(c) !== tag);
-            const first_query = this._pending_commands.findIndex(isQuery);
-            if (first_query < 0)
-                this._pending_commands.push(cmd);
-            else
-                this._pending_commands.splice(first_query, 0, cmd);
-        }
-
+        this._pending_commands = enqueueCommand(this._pending_commands, cmd);
         this.log.debug(`Queued command ${JSON.stringify(cmd)}, queue length ${this._pending_commands.length}`);
         this.processNextCommand();
     }
@@ -192,7 +156,7 @@ class EpsonEscVp21 extends utils.Adapter {
 
         this.log.debug(`Sending ${JSON.stringify(cmd)}, still in queue: ${this._pending_commands.length}`);
         this._process_command = cmd;
-        this.startCommandTimer(cmd.startsWith("PWR ") ? POWER_COMMAND_TIMEOUT_MS : COMMAND_TIMEOUT_MS);
+        this.startCommandTimer(cmd.startsWith("PWR ") ? this._timing.power_command_timeout : this._timing.command_timeout);
         this._client.write(cmd, "latin1");
     }
 
@@ -219,7 +183,7 @@ class EpsonEscVp21 extends utils.Adapter {
         this._command_timer = null;
 
         if (!this._handshake_done) {
-            this.log.warn(`No handshake reply from projector within ${HANDSHAKE_TIMEOUT_MS / 1000} s`);
+            this.log.warn(`No handshake reply from projector within ${this._timing.handshake_timeout / 1000} s`);
             this.dropConnection();
             return;
         }
@@ -330,10 +294,6 @@ class EpsonEscVp21 extends utils.Adapter {
      * @param {string} line
      */
     gotLine(line) {
-        line = line.replace(/^\n+|\n+$/g, "");
-        if (line === "")
-            return;
-
         if (this._process_command === null && !line.startsWith("IMEVENT"))
             this.log.warn(`Got unexpected spurious reply: ${JSON.stringify(line)}`);
 
@@ -374,29 +334,22 @@ class EpsonEscVp21 extends utils.Adapter {
 
             this.log.info("Connection to projector established");
             this._handshake_done = true;
-            this._reconnect_delay = RECONNECT_MIN_DELAY_MS;
+            this._reconnect_delay = this._timing.reconnect_min_delay;
             this.clearCommandTimer();
             this._process_command = null;
             this.setState("info.connection", true, true);
             this.pollDeviceStatus();
         }
 
-        // Replies are lines terminated by "\r"; the ":" prompt (without "\r") marks the end of a command.
-        while (this._rx.length > 0) {
-            if (this._rx[0] === ":") {
-                this._rx = this._rx.slice(1);
+        const { items, rest } = extractReplies(this._rx);
+        this._rx = rest;
+        for (const item of items) {
+            if ("prompt" in item) {
                 if (this._process_command !== null)
                     this.commandFinished();
-                continue;
+            } else {
+                this.gotLine(item.line);
             }
-
-            const end = this._rx.indexOf("\r");
-            if (end < 0)
-                break;
-
-            const line = this._rx.slice(0, end);
-            this._rx = this._rx.slice(end + 1);
-            this.gotLine(line);
         }
 
         if (this._rx.length > MAX_RX_BUFFER) {
@@ -433,7 +386,7 @@ class EpsonEscVp21 extends utils.Adapter {
         client.on("close", () => this.onConnectionClosed(client));
 
         // Covers both the TCP connect and the handshake reply
-        this.startCommandTimer(HANDSHAKE_TIMEOUT_MS);
+        this.startCommandTimer(this._timing.handshake_timeout);
         client.connect({ port: port, host: host });
     }
 
@@ -468,7 +421,7 @@ class EpsonEscVp21 extends utils.Adapter {
         this.log.info(`Connection to projector closed, reconnecting in ${this._reconnect_delay / 1000} s`);
 
         this._reconnect_timer = setTimeout(this.connectToDevice.bind(this), this._reconnect_delay);
-        this._reconnect_delay = Math.min(this._reconnect_delay * 2, RECONNECT_MAX_DELAY_MS);
+        this._reconnect_delay = Math.min(this._reconnect_delay * 2, this._timing.reconnect_max_delay);
     }
 
     // ---------------------------------------------------------------- adapter lifecycle
@@ -550,7 +503,7 @@ class EpsonEscVp21 extends utils.Adapter {
 
             this.setState("info.connection", false, true);
             callback();
-        } catch (e) {
+        } catch {
             callback();
         }
     }

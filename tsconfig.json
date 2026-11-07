@@ -25,6 +25,8 @@
         // "noUnusedLocals": true,
         // "noUnusedParameters": true,
         "useUnknownInCatchVariables": false,
+        // type errors inside node_modules are not ours to fix
+        "skipLibCheck": true,
 
         // Consider targetting es2019 or higher if you only support Node.js 12+
         "target": "es2018",

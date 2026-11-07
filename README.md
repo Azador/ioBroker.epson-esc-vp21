@@ -38,6 +38,8 @@ Several data points are only returned by the projector, if it is switched on (e.
 * (Azador) Fixed command name for tracking (TRACKING)
 * (Azador) Fixed state changes for instance numbers >= 10
 * (Azador) Removed unused lib/tools.js and the invalid npm script "publish"
+* (Azador) Requires Node.js >= 20, js-controller >= 6.0.11 and admin >= 7.6.17
+* (Azador) Added unit tests for the protocol handling, fixed test and lint setup
 
 ### 0.1.6 (2022-11-04)
 * (Azador) Cleanup of change log.
