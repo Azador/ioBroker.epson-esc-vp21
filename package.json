@@ -38,7 +38,7 @@
     "@eslint/js": "^9.39.5",
     "@iobroker/adapter-dev": "^1.5.0",
     "@iobroker/testing": "^6.3.1",
-    "@iobroker/types": "^6.0.11",
+    "@iobroker/types": "^7.2.5",
     "@types/chai": "^4.3.20",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.10",
