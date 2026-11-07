@@ -60,7 +60,7 @@ Values that the projector does not support are set to `null` (numbers, switches)
     ### **WORK IN PROGRESS**
 
 -->
-### **WORK IN PROGRESS**
+### 0.2.0 (2026-11-07)
 * (Azador) Automatic reconnect (with backoff) when the connection to the projector is lost
 * (Azador) Robust parsing of replies split or merged by TCP, timeout for unanswered commands
 * (Azador) No more duplicate commands in the queue, user commands are sent before pending polls
