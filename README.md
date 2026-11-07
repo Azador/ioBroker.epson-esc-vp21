@@ -61,7 +61,6 @@ Values that the projector does not support are set to `null` (numbers, switches)
 
 -->
 ### **WORK IN PROGRESS**
-* (Azador) Bump @iobroker/testing from 3.0.2 to 4.1.0
 * (Azador) Automatic reconnect (with backoff) when the connection to the projector is lost
 * (Azador) Robust parsing of replies split or merged by TCP, timeout for unanswered commands
 * (Azador) No more duplicate commands in the queue, user commands are sent before pending polls
@@ -97,7 +96,7 @@ Values that the projector does not support are set to `null` (numbers, switches)
 ## License
 MIT License
 
-Copyright (c) 2022 Azador <github@lobo.uber.space>
+Copyright (c) 2022-2026 Azador <github@lobo.uber.space>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
