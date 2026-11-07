@@ -4,7 +4,7 @@ const globals = require("globals");
 
 module.exports = [
     {
-        ignores: ["node_modules/", ".dev-server/", "admin/words.js"],
+        ignores: ["node_modules/", ".dev-server/"],
     },
     js.configs.recommended,
     {

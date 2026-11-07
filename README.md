@@ -5,23 +5,54 @@
 [![Downloads](https://img.shields.io/npm/dm/iobroker.epson-esc-vp21.svg)](https://www.npmjs.com/package/iobroker.epson-esc-vp21)
 ![Number of Installations](https://iobroker.live/badges/epson-esc-vp21-installed.svg)
 ![Current version in stable repository](https://iobroker.live/badges/epson-esc-vp21-stable.svg)
-[![Dependency Status](https://img.shields.io/david/Azador/iobroker.epson-esc-vp21.svg)](https://david-dm.org/Azador/iobroker.epson-esc-vp21)
-
-[![NPM](https://nodei.co/npm/iobroker.epson-esc-vp21.png?downloads=true)](https://nodei.co/npm/iobroker.epson-esc-vp21/)
 
 **Tests:** ![Test and Release](https://github.com/Azador/ioBroker.epson-esc-vp21/workflows/Test%20and%20Release/badge.svg)
 
 ## epson-esc-vp21 adapter for ioBroker
 
-Adapter for [Epson projectors](https://epson.com/projectors) with ESC/VP21 support via TCP/IP (e.g. EH-TW5650)
+Adapter for [Epson projectors](https://epson.com/projectors) with ESC/VP21 support via TCP/IP (ESC/VP.net, e.g. EH-TW5650).
 
-The adapter needs the network address of the projector and the port number where it can be reached (defaults to 'Beamer:3629').
-There is a poll interval in the configuration, but this normally is not necessary because the projector sends status changes by itself to open connections, so that the changes normally are updated within seconds.
-There is also an entry for the type of the device. The option "Generic" should work for all Epson projectors that support ESC-VP21. But if you select your device type here, the adapter can show additional objects that are not exist for all devices.
+The projector sends status changes by itself to open connections, so changes are normally updated within seconds.
+If the connection is lost, the adapter reconnects automatically.
 
-If your projector is missing in the list, let me now.
+## Configuration
 
-Several data points are only returned by the projector, if it is switched on (e.g. in case of the projector Epson EH-TW5650, only state, power_state, lamp_hours and serial_number are set when the projector is turned off).
+| Option          | Default  | Description                                                                 |
+|-----------------|----------|-----------------------------------------------------------------------------|
+| Network address | `Beamer` | IP address or hostname of the projector                                     |
+| Port number     | `3629`   | TCP port of the ESC/VP.net interface                                        |
+| Poll interval   | `60`     | Seconds between two polls of all values (normally not critical, see above)  |
+| Device type     | Generic  | Selects additional data points that only exist on some projectors           |
+
+The device type "Generic" should work for all Epson projectors that support ESC/VP21.
+If you select your device type, the adapter shows additional objects that do not exist on all devices.
+
+Supported device types:
+
+* Generic
+* Epson EH-TW5650
+* Epson EH-LS12000
+
+If your projector is missing in the list, let me know.
+
+## States
+
+All states are created below `epson-esc-vp21.<instance>.projector`:
+
+| State                                                                          | Writable | Description                                                          |
+|--------------------------------------------------------------------------------|----------|----------------------------------------------------------------------|
+| `state`                                                                        | yes      | Power on (`true`) / standby (`false`)                                |
+| `power_state`                                                                  | no       | Detailed power state, e.g. `Lamp on`, `Warmup`, `Standby, network on` |
+| `lamp_hours`, `operation_time`                                                 | no       | Lamp hours / operation time in hours                                 |
+| `serial_number`, `source`, `aspect`, `color_mode`, `gamma`, ...                | no       | Information reported by the projector                                |
+| `brightness`, `contrast`, `sharpness`, `color_temperature`, `tint`, ...         | yes      | Picture settings (0 – 255)                                           |
+| `auto_keystone`, `auto_source_search`, `illumination`, `horizontal_reverse`, ... | yes    | Switches                                                             |
+| `volume`, `horizontal_position`, `vertical_position`, `tracking`, ...          | yes      | EH-TW5650 only                                                       |
+| `zoom`, `focus`, `vertical_lens_shift`, `horizontal_lens_shift` (0 – 1023), ... | yes     | EH-LS12000 only                                                      |
+
+Several data points are only returned by the projector if it is switched on (e.g. in case of the Epson EH-TW5650,
+only `state`, `power_state`, `lamp_hours` and `serial_number` are set while the projector is in standby).
+Values that the projector does not support are set to `null` (numbers, switches) or `n/a` (texts).
 
 ## Changelog
 <!--
@@ -40,6 +71,10 @@ Several data points are only returned by the projector, if it is switched on (e.
 * (Azador) Removed unused lib/tools.js and the invalid npm script "publish"
 * (Azador) Requires Node.js >= 20, js-controller >= 6.0.11 and admin >= 7.6.17
 * (Azador) Added unit tests for the protocol handling, fixed test and lint setup
+* (Azador) Existing objects are updated on start; added min/max/unit, corrected roles
+* (Azador) Invalid or out-of-range values are no longer sent to the projector
+* (Azador) Removed old materialize admin files
+* (Azador) Documented configuration and states in the README
 
 ### 0.1.6 (2022-11-04)
 * (Azador) Cleanup of change log.

@@ -103,6 +103,8 @@ class FakeAdapter extends EventEmitter {
         this.config = { net_address: "127.0.0.1", port_number: 0, poll_interval: 60, device_type: "generic" };
         /** @type {Record<string, any>} */
         this.states = {};
+        /** @type {Record<string, any>} */
+        this.objects = {};
         /** @type {string[]} */
         this.logs = [];
         const log = (level) => (msg) => this.logs.push(`${level}: ${msg}`);
@@ -110,7 +112,7 @@ class FakeAdapter extends EventEmitter {
     }
     setState(id, val) { this.states[id] = val; }
     async setStateAsync(id, val) { this.states[id] = val; }
-    async setObjectNotExistsAsync() { /* not needed */ }
+    async extendObjectAsync(id, obj) { this.objects[id] = obj; }
     subscribeStates() { /* not needed */ }
 }
 
@@ -308,6 +310,32 @@ describe("adapter with simulated projector", function () {
         adapter.emit("stateChange", adapter.namespace + ".projector.illumination", { val: false, ack: false });
         await waitFor(() => projector.received.includes("ILLUM 00"));
         expect(projector.received).to.include("AUTOKEYSTONE ON");
+    });
+
+    it("creates objects with role, min, max and unit", async () => {
+        await start();
+        expect(adapter.objects["projector.brightness"].common).to.include({ type: "number", role: "level", min: 0, max: 255, write: true });
+        expect(adapter.objects["projector.lamp_hours"].common).to.include({ role: "value", unit: "h", write: false });
+        expect(adapter.objects["projector.auto_keystone"].common).to.not.have.any.keys("on", "off");
+        expect(adapter.objects).to.not.have.property("projector.zoom"); // only for EH-LS12000
+    });
+
+    it("does not send invalid values", async () => {
+        projector.power = "01";
+        await start();
+        for (const val of [300, -1, 1.5, "abc", null])
+            adapter.emit("stateChange", adapter.namespace + ".projector.brightness", { val, ack: false });
+        adapter.emit("stateChange", adapter.namespace + ".projector.contrast", { val: "42", ack: false });
+        await waitFor(() => projector.received.includes("CONTRAST 42"));
+        expect(projector.received.filter((c) => c.startsWith("BRIGHT "))).to.deep.equal([]);
+        expect(adapter.logs.filter((l) => l.includes("Invalid value for projector.brightness"))).to.have.length(5);
+    });
+
+    it("sets number states to null for non-numeric replies", async () => {
+        projector.values.LAMP = () => "xyz";
+        await start();
+        await waitFor(() => "projector.lamp_hours" in adapter.states);
+        expect(adapter.states["projector.lamp_hours"]).to.equal(null);
     });
 
     it("continues with the next command after a timeout", async () => {
