@@ -1,5 +1,5 @@
 {
-    "i18m": true,
+    "i18n": true,
     "type": "tabs",
     "items": {
         "_options": {
@@ -23,7 +23,7 @@
                     "lg": 6,
                     "label": "Port number"
                 },
-                "poll_intervall": {
+                "poll_interval": {
                     "type": "number",
                     "min": 1,
                     "max": 3600,

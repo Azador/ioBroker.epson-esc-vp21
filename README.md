@@ -31,6 +31,13 @@ Several data points are only returned by the projector, if it is switched on (e.
 -->
 ### **WORK IN PROGRESS**
 * (Azador) Bump @iobroker/testing from 3.0.2 to 4.1.0
+* (Azador) Automatic reconnect (with backoff) when the connection to the projector is lost
+* (Azador) Robust parsing of replies split or merged by TCP, timeout for unanswered commands
+* (Azador) No more duplicate commands in the queue, user commands are sent before pending polls
+* (Azador) Fixed poll interval setting in the admin UI (was stored under a wrong key)
+* (Azador) Fixed command name for tracking (TRACKING)
+* (Azador) Fixed state changes for instance numbers >= 10
+* (Azador) Removed unused lib/tools.js and the invalid npm script "publish"
 
 ### 0.1.6 (2022-11-04)
 * (Azador) Cleanup of change log.

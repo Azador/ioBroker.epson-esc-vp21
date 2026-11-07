@@ -23,7 +23,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:Azador/ioBroker.epson-esc-vp21.git"
+    "url": "git+https://github.com/Azador/ioBroker.epson-esc-vp21.git"
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.1.6"
@@ -71,8 +71,7 @@
     "release": "release-script patch --yes",
     "release-minor": "release-script minor --yes",
     "release-major": "release-script major --yes",
-    "version": "release-script version",
-    "publish": "release-script publish"
+    "version": "release-script version"
   },
   "bugs": {
     "url": "https://github.com/Azador/ioBroker.epson-esc-vp21/issues"
