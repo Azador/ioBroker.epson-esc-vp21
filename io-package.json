@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "epson-esc-vp21",
-    "version": "0.3.0-alpha.0",
+    "version": "0.3.0",
     "news": {
+      "0.3.0": {
+        "en": "Requires Node.js >= 22 (Node.js 20 is end of life) and js-controller >= 7.2.2\nUpdated dependencies\nAdded tier and licenseInformation to io-package.json",
+        "de": "Benötigt Node.js >= 22 (Node.js 20 ist ausgelaufen) und js-controller >= 7.2.2\nNeue Abhängigkeiten\nStufe und Lizenzdaten zu io-package.json hinzugefügt",
+        "ru": "Требуется файл Node.js >= 22 (срок службы Node.js 20 истек) и js-контроллер >= 7.2.2\nОбновленные зависимости\nДобавлена информация об уровне и лицензии в io-package.json",
+        "pt": "Requer Node.js >= 22 (Node.js 20 é fim) e js-controller >= 7.2.2\nDependências novas\nAdição de nível e licença ao io-package.json",
+        "nl": "Vereist Node.js >= 22 (Node.js 20 is het einde van de levensduur) en js-controller >= 7.2.2\nBijgewerkte afhankelijkheden\nNiveau- en licentiegegevens toegevoegd aan io-package.json",
+        "fr": "Nécessite Node.js >= 22 (Node.js 20 est en fin de vie) et JS-Controller >= 7.2.2\nDépendances mises à jour\nNiveau et licence ajoutés à io-package.json",
+        "it": "Richiede Node.js >= 22 (Node.js 20 è scaduto) e js-controller >= 7.2.2\nDipendenze nuove\nAggiunti dati su livello e licenza a io-package.json",
+        "es": "Requiere Node.js >= 22 (Node.js 20 es el fin de su vida útil) y js-controller >= 7.2.2\nDependencias actualizadas\nAñadió información de nivel y licencia a io-package.json",
+        "pl": "Wymaga Node.js >= 22 (Node.js 20 to koniec życia) i js-controller >= 7.2.2\nZaktualizowane zależności\nDodano informacje o poziomie i licencji do io-package.json",
+        "uk": "Потрібен Node.js >= 22 (Node.js 20 - кінець життя) і js-контролер> = 7.2.2\nОновлені залежності\nДодано інформацію про рівень та ліцензію до io-package.json",
+        "zh-cn": "需要 Node.js >= 22（Node.js 20 是生命周期的终结）和 js-controller >= 7.2.2\n更新的依赖关系\n向 io-package.json 添加了等级和许可证信息"
+      },
       "0.2.0": {
         "en": "Automatic reconnect (with backoff) when the connection to the projector is lost\nRobust parsing of replies split or merged by TCP, timeout for unanswered commands\nNo more duplicate commands in the queue, user commands are sent before pending polls\nFixed poll interval setting in the admin UI (was stored under a wrong key)\nFixed command name for tracking (TRACKING)\nFixed state changes for instance numbers >= 10\nRemoved unused lib/tools.js and the invalid npm script \"publish\"\nRequires Node.js >= 20, js-controller >= 6.0.11 and admin >= 7.6.17\nAdded unit tests for the protocol handling, fixed test and lint setup\nExisting objects are updated on start; added min/max/unit, corrected roles\nInvalid or out-of-range values are no longer sent to the projector\nRemoved old materialize admin files\nDocumented configuration and states in the README",
         "de": "Automatisches Wiederverbinden (mit Backoff), wenn der Beamer getrennt ist\nRobustes Analysieren von TCP-Antworten, Timeout für unbeantwortete Befehle\nKeine doppelten Befehle mehr, Benutzerbefehle werden vor Umfragen gesendet\nDas Abfrageintervall im Admin-UI wurde falsch eingegeben\nFester Befehlsname (TRACKING)\nFeste Statusänderungen für Instanznummern >= 10\nUngenutzte lib/tools.js und ungültiges NPM-Skript „publish“ entfernt\nBenötigt Node.js >= 20, js-controller >= 6.0.11 und admin >= 7.6.17\nUnit-Tests für Protocol Handling, Fixed Test und Lint Setup hinzugefügt\nObjekte werden beim Start aktualisiert; Min/Max/Unit, Rollen korrigiert\nUngültige oder falsche Werte werden nicht mehr an den Beamer gesendet\nAlte Materialize Admin-Dateien entfernt\nKonfiguration und Status in der README",
