@@ -39,6 +39,7 @@
         "it": "Testare il processo di rilascio",
         "es": "Pruebas del proceso de liberación",
         "pl": "Testowanie procesu premierowego",
+        "uk": "Тестування процесу випуску",
         "zh-cn": "试验释放过程"
       },
       "0.1.1": {
@@ -51,19 +52,8 @@
         "it": "npm integrazione\nModificata alla configurazione Admin 5",
         "es": "npm integración\nCambio en la configuración Admin 5",
         "pl": "integracja\nPrzemianowany na Admin 5",
+        "uk": "Інтеграція з npm\nПереведено на конфігурацію Admin 5",
         "zh-cn": "合并\nB. 修改第5类组合"
-      },
-      "0.1.0": {
-        "en": "Initial release",
-        "de": "Erstveröffentlichung",
-        "ru": "Первый выпуск",
-        "pt": "Lançamento inicial",
-        "nl": "Eerste uitgave",
-        "fr": "Première version",
-        "it": "Versione iniziale",
-        "es": "Versión inicial",
-        "pl": "Pierwsze wydanie",
-        "zh-cn": "初始发行"
       }
     },
     "titleLang": {
@@ -76,6 +66,7 @@
       "it": "Proiettore Epson tramite ESC/VP21",
       "es": "Proyector Epson vía ESC/VP21",
       "pl": "Projektor Epson przez ESC/VP21",
+      "uk": "Проектор Epson через ESC/VP21",
       "zh-cn": "爱普生投影仪通过 ESC/VP21"
     },
     "desc": {
@@ -88,6 +79,7 @@
       "it": "Adattatore per proiettori Epson con supporto ESC/VP21 tramite WiFi (es. EH-TW5650)",
       "es": "Adaptador para proyectores Epson con soporte ESC/VP21 vía WiFi (ej. EH-TW5650)",
       "pl": "Adapter do projektorów Epson z obsługą ESC/VP21 przez WiFi (np. EH-TW5650)",
+      "uk": "Адаптер для проекторів Epson з підтримкою ESC/VP21 через WiFi (наприклад, EH-TW5650)",
       "zh-cn": "通过 WiFi 支持 ESC/VP21 的 Epson 投影仪适配器（例如 EH-TW5650）"
     },
     "authors": [
@@ -104,7 +96,6 @@
       "license": "MIT"
     },
     "platform": "Javascript/Node.js",
-    "main": "main.js",
     "icon": "epson-esc-vp21.png",
     "enabled": true,
     "extIcon": "https://raw.githubusercontent.com/Azador/ioBroker.epson-esc-vp21/main/admin/epson-esc-vp21.png",
