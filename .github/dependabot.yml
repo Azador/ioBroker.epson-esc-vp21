@@ -10,3 +10,9 @@ updates:
   assignees:
   - Azador
   versioning-strategy: increase
+  ignore:
+    # @types/node has to match the minimum supported Node.js version (engines in package.json),
+    # otherwise the type check would accept APIs that do not exist there.
+    # Remove this rule when the minimum Node.js version is raised.
+    - dependency-name: "@types/node"
+      update-types: ["version-update:semver-major"]

@@ -9,8 +9,8 @@
         "allowJs": true,
         "checkJs": true,
 
-        "module": "commonjs",
-        "moduleResolution": "node",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
         "esModuleInterop": true,
         // this is necessary for the automatic typing of the adapter config
         "resolveJsonModule": true,
@@ -27,6 +27,8 @@
         "useUnknownInCatchVariables": false,
         // type errors inside node_modules are not ours to fix
         "skipLibCheck": true,
+        // TypeScript >= 6 no longer includes all @types packages automatically
+        "types": ["node", "mocha", "@iobroker/types"],
 
         // Consider targetting es2019 or higher if you only support Node.js 12+
         "target": "es2018",
