@@ -1,6 +1,6 @@
 {
   "name": "iobroker.epson-esc-vp21",
-  "version": "0.2.0",
+  "version": "0.3.0-alpha.0",
   "description": "Adapter for Epson projectors with ESC/VP21 support via WiFi (e.g. EH-TW5650)",
   "author": {
     "name": "Azador",
@@ -70,8 +70,7 @@
     "translate": "translate-adapter",
     "release": "release-script patch --yes",
     "release-minor": "release-script minor --yes",
-    "release-major": "release-script major --yes",
-    "version": "release-script version"
+    "release-major": "release-script major --yes"
   },
   "bugs": {
     "url": "https://github.com/Azador/ioBroker.epson-esc-vp21/issues"

@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "epson-esc-vp21",
-    "version": "0.2.0",
+    "version": "0.3.0-alpha.0",
     "news": {
       "0.2.0": {
         "en": "Automatic reconnect (with backoff) when the connection to the projector is lost\nRobust parsing of replies split or merged by TCP, timeout for unanswered commands\nNo more duplicate commands in the queue, user commands are sent before pending polls\nFixed poll interval setting in the admin UI (was stored under a wrong key)\nFixed command name for tracking (TRACKING)\nFixed state changes for instance numbers >= 10\nRemoved unused lib/tools.js and the invalid npm script \"publish\"\nRequires Node.js >= 20, js-controller >= 6.0.11 and admin >= 7.6.17\nAdded unit tests for the protocol handling, fixed test and lint setup\nExisting objects are updated on start; added min/max/unit, corrected roles\nInvalid or out-of-range values are no longer sent to the projector\nRemoved old materialize admin files\nDocumented configuration and states in the README",
